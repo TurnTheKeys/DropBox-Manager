@@ -2,7 +2,7 @@
 ## Goal
 - The goal is to make a program that allows for interaction with GitHub
 
-##Intended Functions
+## Intended Functions
 - This will include ways to:
  - Open a JSON file to get token information
  - Generate tokens
