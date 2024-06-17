@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Desktop\\GitHub Projects\\Console App\\DropBox Upload\\DropBox Upload\\DropBox Upload.csproj": {}
+    "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBox Upload.csproj": {}
   },
   "projects": {
-    "D:\\Desktop\\GitHub Projects\\Console App\\DropBox Upload\\DropBox Upload\\DropBox Upload.csproj": {
+    "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBox Upload.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Desktop\\GitHub Projects\\Console App\\DropBox Upload\\DropBox Upload\\DropBox Upload.csproj",
+        "projectUniqueName": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBox Upload.csproj",
         "projectName": "DropBox Upload",
-        "projectPath": "D:\\Desktop\\GitHub Projects\\Console App\\DropBox Upload\\DropBox Upload\\DropBox Upload.csproj",
+        "projectPath": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBox Upload.csproj",
         "packagesPath": "C:\\Users\\tommy\\.nuget\\packages\\",
-        "outputPath": "D:\\Desktop\\GitHub Projects\\Console App\\DropBox Upload\\DropBox Upload\\obj\\",
+        "outputPath": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

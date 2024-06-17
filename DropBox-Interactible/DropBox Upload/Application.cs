@@ -8,7 +8,9 @@ namespace DropBox_Upload
 {
     internal class Application
     {
-        
+
+        KeyInformation TokensToUse { get; set; }
+
 
 
     }

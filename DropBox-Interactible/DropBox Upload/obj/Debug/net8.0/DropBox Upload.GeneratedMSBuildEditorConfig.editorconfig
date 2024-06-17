@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = DropBox_Upload
-build_property.ProjectDir = D:\Desktop\GitHub Projects\New folder\DropBox Upload\DropBox-Interactible\DropBox Upload\
+build_property.ProjectDir = D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
