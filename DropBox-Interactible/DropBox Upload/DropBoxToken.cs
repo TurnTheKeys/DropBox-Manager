@@ -27,8 +27,9 @@ namespace DropBox_Upload
 
         private DateTime TokenExpiryTime {  get; set; } = DateTime.Now;
         
-        public DropBoxToken(string FilePath) {
+        public DropBoxToken(string givenFilePath) {
 
+            FilePath = givenFilePath;
             FileChecker();
             TokenValidation();
         }
@@ -39,10 +40,8 @@ namespace DropBox_Upload
         /// <returns>If file was sucessfully found</returns>
         private bool FileChecker()
         {
-            string userInput = Console.ReadLine() ?? String.Empty;
-            if (File.Exists(userInput))
+            if (File.Exists(FilePath))
             {
-                FilePath = userInput;
                 return true;
             }
             else

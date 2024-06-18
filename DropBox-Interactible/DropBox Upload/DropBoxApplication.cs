@@ -12,9 +12,12 @@ class DropBoxApplication
         ProgramMenu();
     }
 
+    /// <summary>
+    /// Generates menu that can be interacted with.
+    /// </summary>
     public void ProgramMenu()
     {
-        string[] optionsAvaliable = { "Upload refresh Token", "Upload File", "Download File" };
+        string[] optionsAvaliable = { "Upload Refresh Token", "Upload File", "Download File" };
         string[] options = { "1", "2", "3" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
         Console.WriteLine();
@@ -22,7 +25,7 @@ class DropBoxApplication
         switch (optionSelected)
         {
             case "1":
-                Console.WriteLine("Please enter file path of the json token, otherwise, if you don't have one,hit enter key");
+                Console.WriteLine("Please enter file path of the json token. If you don't have one, hit enter key.");
                 dropboxToken = new DropBoxToken(Console.ReadLine() ?? "");
                 break;
             default:
