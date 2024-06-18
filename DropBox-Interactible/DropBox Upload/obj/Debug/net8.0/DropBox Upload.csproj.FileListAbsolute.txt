@@ -1,0 +1,18 @@
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\bin\Debug\net8.0\DropBox Upload.exe
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\bin\Debug\net8.0\DropBox Upload.deps.json
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\bin\Debug\net8.0\DropBox Upload.runtimeconfig.json
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\bin\Debug\net8.0\DropBox Upload.dll
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\bin\Debug\net8.0\DropBox Upload.pdb
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\bin\Debug\net8.0\Newtonsoft.Json.dll
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.csproj.AssemblyReference.cache
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.GeneratedMSBuildEditorConfig.editorconfig
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.AssemblyInfoInputs.cache
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.AssemblyInfo.cs
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.csproj.CoreCompileInputs.cache
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.sourcelink.json
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox .5AF181C4.Up2Date
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.dll
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\refint\DropBox Upload.dll
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.pdb
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\DropBox Upload.genruntimeconfig.cache
+D:\Desktop\GitHub Projects\C# Console App\DropBox-Interactible\DropBox-Interactible\DropBox Upload\obj\Debug\net8.0\ref\DropBox Upload.dll

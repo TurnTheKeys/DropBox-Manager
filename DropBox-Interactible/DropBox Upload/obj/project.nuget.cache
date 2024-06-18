@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "qeu7C3zgzi8=",
+  "dgSpecHash": "8+GVsT1tEKI=",
   "success": true,
   "projectFilePath": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBox Upload.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\tommy\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace DropBox_Upload
 {
-    internal class Application
+    class Start
     {
-
-        KeyInformation TokensToUse { get; set; }
-
+        public static void Main(string[] args)
+        {
+            DropBoxApplication app = new DropBoxApplication();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -7,37 +8,66 @@ using System.Threading.Tasks;
 
 namespace DropBox_Upload
 {
-    internal class KeyInformation
+    internal class DropBoxRefreshToken
     {
-        private string FilePath = string.Empty;
-        private string[] KeyJSONInformation { get; set; } = new string[0];
-        private string RefreshToken {  get; set; } = string.Empty;
-        private string AppKey {  get; set; } = string.Empty;
-        private string AppSecret { get; set; } = string.Empty;
-        private string AppKeySecret {  get; set; } = string.Empty;
+        private string refresh_token { get; set; } = string.Empty;
+        private string scope { get; set; } = string.Empty;
+        private string uid { get; set; } = string.Empty;
+        private string account_id { get; set; } = string.Empty;
+        private string app_secret { get; set; } = string.Empty;
+        private string client_id { get; set; } = string.Empty;
+    }
 
-        private string AccessCode { get; set; } = string.Empty;
+    internal class DropBoxToken
+    {
+        DropBoxRefreshToken RefreshToken = new DropBoxRefreshToken();
+
+        private string FilePath = string.Empty;
+        private string json = string.Empty;
+
         private DateTime TokenExpiryTime {  get; set; } = DateTime.Now;
         
-        public KeyInformation(string filePath) {
+        public DropBoxToken(string FilePath) {
 
-            filePath = filePath ?? string.Empty;
+            FileChecker();
             TokenValidation();
         }
 
         /// <summary>
-        /// Validates token to see if it exists and check if token information can be extracted
+        /// Validates entered file
+        /// </summary>
+        /// <returns>If file was sucessfully found</returns>
+        private bool FileChecker()
+        {
+            string userInput = Console.ReadLine() ?? String.Empty;
+            if (File.Exists(userInput))
+            {
+                FilePath = userInput;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Validates token from given filepath to see if it exists and check if token information can be extracted
         /// </summary>
         /// <returns>If validation was successful</returns>
         private bool TokenValidation()
         {
-            if (ExtractJSONToken() == false)
+            if (ExtractJSONInformation() == false)
             {
                 string question = ("The retrieval of the refresh token information was unsuccessful, do you want to generate one?");
                 string[] validOptions = {"y", "n"};
 
                 string userInput = UserAnswer(question, validOptions);
-
+            }
+            else
+            {
+                return true;
             }
             return false;
         }
@@ -93,10 +123,38 @@ namespace DropBox_Upload
         /// Extract token information from specified file location
         /// </summary>
         /// <returns>Whether or not the token information retrieval was successful</returns>
-        private bool ExtractJSONToken()
+        private bool ExtractJSONInformation()
         {
+            if (File.Exists(FilePath))
+            {
+                return false;
+            }
+            else
+            {
+                string json = ExtractText();
+                RefreshToken = JsonConvert.DeserializeObject<DropBoxRefreshToken>(json);
+                
+            }
             return false;
         }
+
+        private string ExtractText()
+        {
+            string extractedText = string.Empty;
+            try
+            {
+                using (StreamReader reader = File.OpenText(FilePath))
+                {
+                    extractedText = reader.ReadToEnd();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("File could not be read: " + e.Message);
+            }
+            return extractedText;
+        }
+
 
         /// <summary>
         /// Exports JSON location to a given location
