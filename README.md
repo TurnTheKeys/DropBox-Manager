@@ -1,4 +1,4 @@
-# DropBox Interactible
+# DropBox Manager
 ## Goal
 - The goal is to make a program that allows for interaction with GitHub
 
