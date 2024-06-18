@@ -8,3 +8,12 @@
  - Generate tokens
  - Access and display directories of the GitHub account
  - Upload and Download Files on DropBox
+
+## Currently Working on
+ - Extracting token information from JSON file
+
+## Required Visual Studio Packages
+- Newtonsoft.Json
+ - Will allow for token json to be read
+  - For information on how to install package: [link](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio) 
+
