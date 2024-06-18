@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,7 +9,8 @@ namespace DropBox_Upload
 {
     internal class KeyInformation
     {
-        private string[] keyJSONInformation { get; set; } = new string[0];
+        private string FilePath = string.Empty;
+        private string[] KeyJSONInformation { get; set; } = new string[0];
         private string RefreshToken {  get; set; } = string.Empty;
         private string AppKey {  get; set; } = string.Empty;
         private string AppSecret { get; set; } = string.Empty;
@@ -18,7 +20,9 @@ namespace DropBox_Upload
         private DateTime TokenExpiryTime {  get; set; } = DateTime.Now;
         
         public KeyInformation(string filePath) {
-        
+
+            filePath = filePath ?? string.Empty;
+            TokenValidation();
         }
 
         /// <summary>
@@ -29,37 +33,50 @@ namespace DropBox_Upload
         {
             if (ExtractJSONToken() == false)
             {
-                Console.WriteLine("The retrieval of the refresh token information was unsuccessful, do you want to generate one? (y/n)");
-                string userInput = Console.ReadLine() ?? string.Empty;
+                string question = ("The retrieval of the refresh token information was unsuccessful, do you want to generate one?");
+                string[] validOptions = {"y", "n"};
+
+                string userInput = UserAnswer(question, validOptions);
+
             }
             return false;
         }
 
 
-        private string UserAnswer(string question, string[] validOptions, ref string answer)
+        /// <summary>
+        /// Gives user question and valid options, if the user chooses an available option, it returns, otherwise keeps asking question
+        /// </summary>
+        /// <param name="question">The question being asked to the user</param>
+        /// <param name="validOptions">Options the users is allowed to select</param>
+        /// <returns>Option the user chooses</returns>
+        private string UserAnswer(string question, string[] validOptions)
         {
-            //Display Question
-            Console.WriteLine($"{question} (");
-            for (int i = 0; i < validOptions.Length; i++)
+            string answer = string.Empty;
+            while (true)
             {
-                Console.Write($"{validOptions[i]}");
-                if (i < (validOptions.Length - 1))
+                //Display Question
+                Console.WriteLine($"{question} (");
+                for (int i = 0; i < validOptions.Length; i++)
                 {
-                    Console.Write("/ ");
+                    Console.Write($"{validOptions[i]}");
+                    if (i < (validOptions.Length - 1))
+                    {
+                        Console.Write("/ ");
+                    }
                 }
+                Console.Write("):");
+
+                //Accept Answer
+                answer = Console.ReadLine() ?? string.Empty;
+
+                //Validate Answer
+                if (validOptions.Contains(answer))
+                {
+                    break;
+                }
+                Console.WriteLine();
+                Console.WriteLine($"'{answer}' is not a valid choice");
             }
-            Console.Write("):");
-
-            //Accept Answer
-            answer = Console.ReadLine() ?? string.Empty;
-
-            //Validate Answer
-            if (!validOptions.Contains(answer))
-            {
-                Console.WriteLine("Sorry, that was not a valid option");
-                UserAnswer(question, validOptions, ref answer);
-            }
-
             return answer;
         }
 
