@@ -84,7 +84,7 @@ namespace DropBox_Upload
             while (true)
             {
                 //Display Question
-                Console.WriteLine($"{question} (");
+                Console.Write($"{question} (");
                 for (int i = 0; i < validOptions.Length; i++)
                 {
                     Console.Write($"{validOptions[i]}");
@@ -124,9 +124,9 @@ namespace DropBox_Upload
         /// <returns>Whether or not the token information retrieval was successful</returns>
         private bool ExtractJSONInformation()
         {
-            if (File.Exists(FilePath))
+            if (!File.Exists(FilePath))
             {
-                Console.WriteLine("File was unable to found at given filepath");
+                Console.WriteLine($"File was unable to found at given filepath: {FilePath}");
                 return false;
             }
             else
