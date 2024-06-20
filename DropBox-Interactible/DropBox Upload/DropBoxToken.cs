@@ -32,6 +32,7 @@ namespace DropBox_Upload
             FilePath = givenFilePath;
             FileChecker();
             TokenValidation();
+            Console.WriteLine();
         }
 
         /// <summary>
@@ -133,6 +134,8 @@ namespace DropBox_Upload
             {
                 string json = ExtractText();
                 RefreshToken = JsonConvert.DeserializeObject<DropBoxRefreshToken>(json);
+                Console.WriteLine("JSON information was succesfully read.");
+                Console.WriteLine();
                 return true;
             }
         }
