@@ -9,7 +9,10 @@ class DropBoxApplication
     {
         Console.WriteLine("Hello, this program allows for files to be downloaded or uploaded to DropBox");
         Console.WriteLine();
-        ProgramMenu();
+        while (true)
+        {
+            ProgramMenu();
+        }
     }
 
     /// <summary>
