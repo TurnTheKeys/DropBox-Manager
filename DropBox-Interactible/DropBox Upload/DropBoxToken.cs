@@ -10,12 +10,12 @@ namespace DropBox_Upload
 {
     internal class DropBoxRefreshToken
     {
-        private string refresh_token { get; set; } = string.Empty;
-        private string scope { get; set; } = string.Empty;
-        private string uid { get; set; } = string.Empty;
-        private string account_id { get; set; } = string.Empty;
-        private string app_secret { get; set; } = string.Empty;
-        private string client_id { get; set; } = string.Empty;
+        public string refresh_token { get; set; } = string.Empty;
+        public string scope { get; set; } = string.Empty;
+        public string uid { get; set; } = string.Empty;
+        public string account_id { get; set; } = string.Empty;
+        public string app_secret { get; set; } = string.Empty;
+        public string client_id { get; set; } = string.Empty;
     }
 
     internal class DropBoxToken
@@ -126,17 +126,38 @@ namespace DropBox_Upload
         {
             if (File.Exists(FilePath))
             {
+                Console.WriteLine("File was unable to found at given filepath");
                 return false;
             }
             else
             {
                 string json = ExtractText();
                 RefreshToken = JsonConvert.DeserializeObject<DropBoxRefreshToken>(json);
-                
+                return true;
             }
-            return false;
         }
 
+
+        /// <summary>
+        /// Prints out token information, used for testing purposes
+        /// </summary>
+        public void PrintToken()
+        {
+            Console.WriteLine($"The stored values for token are:");
+            Console.WriteLine($"Refresh Token: {RefreshToken.refresh_token}");
+            Console.WriteLine($"Account Id: {RefreshToken.account_id}");
+            Console.WriteLine($"Scope: {RefreshToken.scope}");
+            Console.WriteLine($"uid: {RefreshToken.uid}");
+            Console.WriteLine($"Account Id: {RefreshToken.account_id}");
+            Console.WriteLine($"App secret: {RefreshToken.app_secret}");
+            Console.WriteLine($"Client Id: {RefreshToken.client_id}");
+        }
+
+
+        /// <summary>
+        /// Attempts to extract text from the class's file path
+        /// </summary>
+        /// <returns></returns>
         private string ExtractText()
         {
             string extractedText = string.Empty;

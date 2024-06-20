@@ -17,8 +17,8 @@ class DropBoxApplication
     /// </summary>
     public void ProgramMenu()
     {
-        string[] optionsAvaliable = { "Upload Refresh Token", "Upload File", "Download File" };
-        string[] options = { "1", "2", "3" };
+        string[] optionsAvaliable = { "Upload Refresh Token", "Check token details", "Upload File", "Download File" };
+        string[] options = { "1", "2", "3", "4" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
         Console.WriteLine();
 
@@ -27,6 +27,9 @@ class DropBoxApplication
             case "1":
                 Console.WriteLine("Please enter file path of the json token. If you don't have one, hit enter key.");
                 dropboxToken = new DropBoxToken(Console.ReadLine() ?? "");
+                break;
+            case "2":
+                dropboxToken.PrintToken();
                 break;
             default:
                 Console.WriteLine("Sorry, either it has yet to be implemented or it is not an option");
