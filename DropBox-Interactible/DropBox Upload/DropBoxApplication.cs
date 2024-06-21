@@ -20,7 +20,8 @@ class DropBoxApplication
     /// </summary>
     public void ProgramMenu()
     {
-        string[] optionsAvaliable = { "Upload Refresh Token", "Check token details", "Upload File", "Download File" };
+        Console.WriteLine();
+        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token","Validate and upload token json information" , "Print token details", "Upload File", "Download File" };
         string[] options = { "1", "2", "3", "4" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
         Console.WriteLine();
@@ -28,10 +29,20 @@ class DropBoxApplication
         switch (optionSelected)
         {
             case "1":
-                Console.WriteLine("Please enter file path of the json token. If you don't have one, hit enter key.");
+                Console.WriteLine("Please enter file path of the json token.");
                 dropboxToken = new DropBoxToken(Console.ReadLine() ?? "");
+                if (dropboxToken.TokenValidation() == false)
+                {
+                    Console.WriteLine($"The token was unable to be retrieved. If you would like like, you can select option 2, to generate the token");
+                }
+                else
+                {
+                    Console.WriteLine($"The token was able to read.");
+                }
                 break;
             case "2":
+
+            case "3":
                 dropboxToken.PrintToken();
                 break;
             default:

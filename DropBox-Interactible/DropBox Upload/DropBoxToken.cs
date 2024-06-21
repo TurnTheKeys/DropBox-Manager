@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,16 @@ namespace DropBox_Upload
         public string account_id { get; set; } = string.Empty;
         public string app_secret { get; set; } = string.Empty;
         public string client_id { get; set; } = string.Empty;
+
+        public bool AllFieldsFilled()
+        {
+            if (refresh_token == string.Empty || scope == string.Empty || uid == string.Empty || account_id == string.Empty || account_id == string.Empty || app_secret == string.Empty || client_id == string.Empty)
+            {
+                Console.WriteLine($"It's missing the refresh token!");
+                return false;
+            }
+            return true;
+        }
     }
 
     internal class DropBoxToken
@@ -30,25 +41,7 @@ namespace DropBox_Upload
         public DropBoxToken(string givenFilePath) {
 
             FilePath = givenFilePath;
-            FileChecker();
-            TokenValidation();
             Console.WriteLine();
-        }
-
-        /// <summary>
-        /// Validates entered file
-        /// </summary>
-        /// <returns>If file was sucessfully found</returns>
-        private bool FileChecker()
-        {
-            if (File.Exists(FilePath))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
 
@@ -56,58 +49,13 @@ namespace DropBox_Upload
         /// Validates token from given filepath to see if it exists and check if token information can be extracted
         /// </summary>
         /// <returns>If validation was successful</returns>
-        private bool TokenValidation()
+        public bool TokenValidation()
         {
             if (ExtractJSONInformation() == false)
             {
-                string question = ("The retrieval of the refresh token information was unsuccessful, do you want to generate one?");
-                string[] validOptions = {"y", "n"};
-
-                string userInput = UserAnswer(question, validOptions);
+                return false;
             }
-            else
-            {
                 return true;
-            }
-            return false;
-        }
-
-
-        /// <summary>
-        /// Gives user question and valid options, if the user chooses an available option, it returns, otherwise keeps asking question
-        /// </summary>
-        /// <param name="question">The question being asked to the user</param>
-        /// <param name="validOptions">Options the users is allowed to select</param>
-        /// <returns>Option the user chooses</returns>
-        private string UserAnswer(string question, string[] validOptions)
-        {
-            string answer = string.Empty;
-            while (true)
-            {
-                //Display Question
-                Console.Write($"{question} (");
-                for (int i = 0; i < validOptions.Length; i++)
-                {
-                    Console.Write($"{validOptions[i]}");
-                    if (i < (validOptions.Length - 1))
-                    {
-                        Console.Write("/ ");
-                    }
-                }
-                Console.Write("):");
-
-                //Accept Answer
-                answer = Console.ReadLine() ?? string.Empty;
-
-                //Validate Answer
-                if (validOptions.Contains(answer))
-                {
-                    break;
-                }
-                Console.WriteLine();
-                Console.WriteLine($"'{answer}' is not a valid choice");
-            }
-            return answer;
         }
 
         /// <summary>
@@ -127,15 +75,17 @@ namespace DropBox_Upload
         {
             if (!File.Exists(FilePath))
             {
-                Console.WriteLine($"File was unable to found at given filepath: {FilePath}");
                 return false;
             }
             else
             {
                 string json = ExtractText();
                 RefreshToken = JsonConvert.DeserializeObject<DropBoxRefreshToken>(json);
-                Console.WriteLine("JSON information was succesfully read.");
-                Console.WriteLine();
+                if (RefreshToken.AllFieldsFilled() == false)
+                {
+                    Console.WriteLine("Unable to properly read token");
+                    return false;
+                }
                 return true;
             }
         }
