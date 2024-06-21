@@ -6,6 +6,10 @@ using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace DropBox_Upload
 {
@@ -34,6 +38,7 @@ namespace DropBox_Upload
 
         private string FilePath = string.Empty;
         private string json = string.Empty;
+        private static readonly HttpClient client = new HttpClient();
 
         private DateTime TokenExpiryTime {  get; set; } = DateTime.Now;
         
@@ -57,12 +62,87 @@ namespace DropBox_Upload
                 return true;
         }
 
-        /// <summary>
+        // <summary>
         /// Generates refresh token and related information for DropBox
         /// </summary>
         /// <returns>If function was successful</returns>
-        private bool GetRefreshToken()
+        public bool GetRefreshToken(string accessCode, string appKey, string appSecret)
         {
+            try
+            {
+                bool result = GetRefreshTokenAsync(accessCode, appKey, appSecret).GetAwaiter().GetResult();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to use generate the refresh token
+        /// </summary>
+        /// <param name="accessCode">Access code generated for app from DropBox</param>
+        /// <param name="appKey">The app key of the app on DropBox</param>
+        /// <param name="appSecret">The app secret of the app on DropBox</param>
+        /// <returns>If function was successful</returns>
+        public async Task<bool> GetRefreshTokenAsync(string accessCode, string appKey, string appSecret)
+        {
+            try
+            {
+                var parameters = new Dictionary<string, string>
+                {
+                    { "code", accessCode },
+                    { "grant_type", "authorization_code" },
+                    { "client_id", appKey },
+                    { "client_secret", appSecret }
+                };
+
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropboxapi.com/oauth2/token")
+                {
+                    Content = new FormUrlEncodedContent(parameters)
+                };
+
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var tokensInformation = JObject.Parse(responseBody);
+                    RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
+                    RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
+                    RefreshToken.uid = tokensInformation["uid"]?.ToString() ?? "";
+                    RefreshToken.account_id = tokensInformation["account_id"]?.ToString() ?? "";
+                    RefreshToken.app_secret = tokensInformation["app_secret"]?.ToString() ?? "";
+                    RefreshToken.client_id = tokensInformation["client_id"]?.ToString() ?? "";
+
+                    return true;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool ConvertTokenJSON(string filePath)
+        {
+            string jsonConvert = System.Text.Json.JsonSerializer.Serialize(RefreshToken, new JsonSerializerOptions { WriteIndented = true });
+            string wholeFilePath = filePath + "\\RefreshToken.json";
+            File.WriteAllTextAsync(wholeFilePath, jsonConvert);
+            if (File.Exists(wholeFilePath))
+            {
+                Console.WriteLine($"Succesfully created token at: {wholeFilePath}");
+                return true;
+            }
             return false;
         }
 
