@@ -32,9 +32,47 @@ namespace DropBox_Upload
         }
     }
 
+    internal class DropBoxAccessToken
+    {
+        public string access_token { get; set; } = string.Empty;
+        public DateTime expires_time { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// Updates the token information
+        /// </summary>
+        /// <param name="access_token_given">The access token represented as a string</param>
+        /// <param name="expiry_time">The seconds left till expiry</param>
+        public void UpdateInformation(string access_token_given, string expiry_time)
+        {
+            access_token = access_token_given;
+            UpdateExpiryTime(int.Parse(expiry_time));
+        }
+
+
+        /// <summary>
+        /// Checks to see if access token is still fresh
+        /// </summary>
+        /// <returns>Returns true if access token is still fresh, otherwise returns false</returns>
+        public bool ExpiryCheck()
+        {
+            DateTime currentTime = DateTime.Now;
+            if (currentTime > expires_time)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public void UpdateExpiryTime(int seconds)
+        {
+            DateTime currentTime = DateTime.Now;
+            expires_time = currentTime.AddSeconds(seconds);
+        }
+    }
     internal class DropBoxToken
     {
-        DropBoxRefreshToken RefreshToken = new DropBoxRefreshToken();
+        private DropBoxRefreshToken RefreshToken = new DropBoxRefreshToken();
+        private DropBoxAccessToken AccessToken = new DropBoxAccessToken();
 
         private string FilePath = string.Empty;
         private string json = string.Empty;
@@ -45,7 +83,6 @@ namespace DropBox_Upload
         public DropBoxToken(string givenFilePath) {
 
             FilePath = givenFilePath;
-            Console.WriteLine();
         }
 
 
@@ -89,6 +126,7 @@ namespace DropBox_Upload
         /// <returns>If function was successful</returns>
         public async Task<bool> GetRefreshTokenAsync(string accessCode, string appKey, string appSecret)
         {
+            Console.WriteLine("Your entered details are:");
             Console.WriteLine($"App key: {appKey}");
             Console.WriteLine($"appSecret: {appSecret}");
             Console.WriteLine($"accessCode: {accessCode}");
@@ -131,8 +169,9 @@ namespace DropBox_Upload
                     RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
                     RefreshToken.uid = tokensInformation["uid"]?.ToString() ?? "";
                     RefreshToken.account_id = tokensInformation["account_id"]?.ToString() ?? "";
-                    RefreshToken.app_secret = tokensInformation["app_secret"]?.ToString() ?? "";
-                    RefreshToken.client_id = tokensInformation["client_id"]?.ToString() ?? "";
+                    RefreshToken.app_secret = appSecret.ToString() ?? "";
+                    RefreshToken.client_id = appKey.ToString() ?? "";
+                    AccessToken.UpdateInformation(tokensInformation["access_token"]?.ToString()??"", tokensInformation["expires_in"]?.ToString()??"0");
 
                     return true;
                 }
@@ -150,6 +189,11 @@ namespace DropBox_Upload
             }
         }
 
+        /// <summary>
+        /// Converts token information into a json so that it can be reused
+        /// </summary>
+        /// <param name="filePath">file path to which the json will be saved</param>
+        /// <returns></returns>
         public bool ConvertTokenJSON(string filePath)
         {
             string jsonConvert = System.Text.Json.JsonSerializer.Serialize(RefreshToken, new JsonSerializerOptions { WriteIndented = true });
