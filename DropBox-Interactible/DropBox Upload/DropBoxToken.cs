@@ -36,6 +36,7 @@ namespace DropBox_Upload
     {
         public string access_token { get; set; } = string.Empty;
         public DateTime expires_time { get; set; } = DateTime.Now;
+        public string token_type { get; set; } = string.Empty;
 
         /// <summary>
         /// Updates the token information
@@ -128,8 +129,13 @@ namespace DropBox_Upload
                 Console.WriteLine("The refresh token has yet to be set up properly");
                 return false;
             }
-            bool accessTokenAttemptRenewal = GetAccessTokenAsync().GetAwaiter().GetResult(); ;
-            return true;
+            if (GetAccessTokenAsync().GetAwaiter().GetResult())
+            {
+                Console.WriteLine($"The Access Token was successfully generated and saved.");
+                return true;
+            }
+            Console.WriteLine("Unable to get access token, please recheck token given or generate a new refresh token");
+            return false;
         }
 
         public async Task<bool> GetAccessTokenAsync()
@@ -145,6 +151,7 @@ namespace DropBox_Upload
                     {"client_secret", RefreshToken.app_secret}
                 };
 
+                Console.WriteLine($"refresh_token: {parameters["refresh_token"]}");
                 Console.WriteLine($"Client_id: {parameters["client_id"]}");
                 Console.WriteLine($"Client_secret: {parameters["client_secret"]}");
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropbox.com/oauth2/token")
@@ -265,9 +272,9 @@ namespace DropBox_Upload
             RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
             RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
             RefreshToken.uid = tokensInformation["uid"]?.ToString() ?? "";
-            RefreshToken.account_id = tokensInformation["account_id"]?.ToString() ?? "";
+            RefreshToken.account_id = appKey ?? "";
             RefreshToken.app_secret = appSecret.ToString() ?? "";
-            RefreshToken.client_id = appKey ?? "";
+            RefreshToken.client_id = tokensInformation["account_id"]?.ToString() ?? "";
             AccessToken.UpdateInformation(tokensInformation["access_token"]?.ToString() ?? "", tokensInformation["expires_in"]?.ToString() ?? "0");
         }
 
