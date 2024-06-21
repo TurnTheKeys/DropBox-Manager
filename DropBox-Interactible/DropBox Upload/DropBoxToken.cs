@@ -22,7 +22,6 @@ namespace DropBox_Upload
         {
             if (refresh_token == string.Empty || scope == string.Empty || uid == string.Empty || account_id == string.Empty || account_id == string.Empty || app_secret == string.Empty || client_id == string.Empty)
             {
-                Console.WriteLine($"It's missing the refresh token!");
                 return false;
             }
             return true;
@@ -96,14 +95,21 @@ namespace DropBox_Upload
         /// </summary>
         public void PrintToken()
         {
-            Console.WriteLine($"The stored values for token are:");
-            Console.WriteLine($"Refresh Token: {RefreshToken.refresh_token}");
-            Console.WriteLine($"Account Id: {RefreshToken.account_id}");
-            Console.WriteLine($"Scope: {RefreshToken.scope}");
-            Console.WriteLine($"uid: {RefreshToken.uid}");
-            Console.WriteLine($"Account Id: {RefreshToken.account_id}");
-            Console.WriteLine($"App secret: {RefreshToken.app_secret}");
-            Console.WriteLine($"Client Id: {RefreshToken.client_id}");
+            if (RefreshToken.AllFieldsFilled() && RefreshToken != null)
+            {
+                Console.WriteLine($"The stored values for token are:");
+                Console.WriteLine($"Refresh Token: {RefreshToken.refresh_token}");
+                Console.WriteLine($"Account Id: {RefreshToken.account_id}");
+                Console.WriteLine($"Scope: {RefreshToken.scope}");
+                Console.WriteLine($"uid: {RefreshToken.uid}");
+                Console.WriteLine($"Account Id: {RefreshToken.account_id}");
+                Console.WriteLine($"App secret: {RefreshToken.app_secret}");
+                Console.WriteLine($"Client Id: {RefreshToken.client_id}");
+            }
+            else
+            {
+                Console.WriteLine("The token has yet to be entered properly");
+            }
         }
 
 

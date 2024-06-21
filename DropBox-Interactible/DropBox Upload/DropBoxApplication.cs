@@ -20,11 +20,9 @@ class DropBoxApplication
     /// </summary>
     public void ProgramMenu()
     {
-        Console.WriteLine();
-        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token","Validate and upload token json information" , "Print token details", "Upload File", "Download File" };
+        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token", "Validate and upload token json information" , "Print token details", "Upload File", "Download File" };
         string[] options = { "1", "2", "3", "4" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
-        Console.WriteLine();
 
         switch (optionSelected)
         {
@@ -37,18 +35,28 @@ class DropBoxApplication
                 }
                 else
                 {
-                    Console.WriteLine($"The token was able to read.");
+                    Console.WriteLine($"The token was able to read, please select option 4 to generate access token.");
                 }
                 break;
-            case "2":
-
-            case "3":
+            case "4":
+                if(CheckNullToken() == false) { break; }
                 dropboxToken.PrintToken();
                 break;
             default:
                 Console.WriteLine("Sorry, either it has yet to be implemented or it is not an option");
                 break;
         }
+        Console.WriteLine();
+    }
+
+    public bool CheckNullToken()
+    {
+        if (dropboxToken == null)
+        {
+            Console.WriteLine("You've yet to setup the token! Please select option 1 first before continuing.");
+            return false;
+        }
+        return true;
     }
 
     /// <summary>
