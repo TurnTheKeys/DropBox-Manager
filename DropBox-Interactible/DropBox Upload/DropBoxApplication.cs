@@ -33,6 +33,9 @@ class DropBoxApplication
                 GenerateTokens();
                 Console.WriteLine();
                 break;
+            case "3":
+                dropboxToken.GetAccessToken();
+                break;
             case "4":
                 PrintTokenInformation();
                 Console.WriteLine();
@@ -67,7 +70,7 @@ class DropBoxApplication
         }
         else
         {
-            Console.WriteLine($"The token was able to read, please select option 4 to generate access token.");
+            Console.WriteLine($"The token was able to read, please select option 3 to generate access token.");
         }
     }
 

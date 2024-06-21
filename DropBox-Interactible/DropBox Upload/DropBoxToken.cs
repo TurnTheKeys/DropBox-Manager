@@ -118,6 +118,78 @@ namespace DropBox_Upload
         }
 
         /// <summary>
+        /// Checks to see if access token is still active, if it is no longer active, generate a new access token
+        /// </summary>
+        /// <returns>Returns true if the access token was succesfully generated, otherwise, return false</returns>
+        public bool GetAccessToken()
+        {
+            if (RefreshToken == null)
+            {
+                Console.WriteLine("The refresh token has yet to be set up properly");
+                return false;
+            }
+            GetAccessTokenAsync();
+            return true;
+        }
+
+        public async Task<bool> GetAccessTokenAsync()
+        {
+            Console.WriteLine("Attempting to get new access token");
+            try
+            {
+                var parameters = new Dictionary<string, string>
+                {
+                    {"grant_type", "refresh_token" },
+                    {"refresh_token", RefreshToken.refresh_token},
+                    {"client_id", RefreshToken.account_id },
+                    {"client_secret", RefreshToken.app_secret}
+                };
+
+                Console.WriteLine($"Client_id: {parameters["client_id"]}");
+                Console.WriteLine($"Client_secret: {parameters["client_secret"]}");
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropbox.com/oauth2/token")
+                {
+                    Content = new FormUrlEncodedContent(parameters)
+                };
+
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    // Log status code and reason phrase
+                    Console.WriteLine($"Status Code: {response.StatusCode}");
+                    Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Error Response: {errorResponse}");
+                        return false;
+                    }
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response Body: {responseBody}");
+
+                    var tokensInformation = JObject.Parse(responseBody);
+                    //AccessToken.UpdateInformation(tokensInformation[])
+                    return true;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+                Console.WriteLine();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return false;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Attempts to use generate the refresh token
         /// </summary>
         /// <param name="accessCode">Access code generated for app from DropBox</param>
@@ -134,12 +206,12 @@ namespace DropBox_Upload
             try
             {
                 var parameters = new Dictionary<string, string>
-            {
-                { "code", accessCode },
-                { "grant_type", "authorization_code" },
-                { "client_id", appKey },
-                { "client_secret", appSecret }
-            };
+                {
+                    { "code", accessCode },
+                    { "grant_type", "authorization_code" },
+                    { "client_id", appKey },
+                    { "client_secret", appSecret }
+                };
 
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropbox.com/oauth2/token")
                 {
@@ -196,7 +268,7 @@ namespace DropBox_Upload
             RefreshToken.uid = tokensInformation["uid"]?.ToString() ?? "";
             RefreshToken.account_id = tokensInformation["account_id"]?.ToString() ?? "";
             RefreshToken.app_secret = appSecret.ToString() ?? "";
-            RefreshToken.client_id = appKey.ToString() ?? "";
+            RefreshToken.client_id = appKey ?? "";
             AccessToken.UpdateInformation(tokensInformation["access_token"]?.ToString() ?? "", tokensInformation["expires_in"]?.ToString() ?? "0");
         }
 
