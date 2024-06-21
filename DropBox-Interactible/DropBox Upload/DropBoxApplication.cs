@@ -15,52 +15,82 @@ class DropBoxApplication
     }
 
     /// <summary>
-    /// Generates menu that can be interacted with.
+    /// Generates menu with program options.
     /// </summary>
     public void ProgramMenu()
     {
-        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token", "Generate access token from refresh token" , "Print token details", "Upload File", "Download File" };
+        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token", "Generate new access token from refresh token" , "Print token details", "Upload File", "Download File" };
         string[] options = { "1", "2", "3", "4" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
 
         switch (optionSelected)
         {
             case "1":
-                Console.WriteLine("Please enter file path of the json token.");
-                dropboxToken = new DropBoxToken(Console.ReadLine() ?? "");
-                if (dropboxToken.TokenValidation() == false)
-                {
-                    Console.WriteLine($"The token was unable to be retrieved. If you would like like, you can select option 2, to generate the token");
-                }
-                else
-                {
-                    Console.WriteLine($"The token was able to read, please select option 4 to generate access token.");
-                }
+                OpenJSONToken();
+                Console.WriteLine();
                 break;
             case "2":
-                Console.WriteLine("To retrieve token, you first need to setup your GitHub account.");
-                Console.WriteLine("To do this, please follow the instructions here: https://github.com/TurnTheKeys/DropBox-Manager");
-                Console.WriteLine("Please enter the app key:");
-                string appKey = Console.ReadLine() ?? "";
-                Console.WriteLine("Please enter the app Secret:");
-                string appSecret = Console.ReadLine() ?? "";
-                Console.WriteLine("Please enter the access code generated:");
-                string accessCode = Console.ReadLine() ?? "";
-                dropboxToken = new DropBoxToken("");
-
-                if (dropboxToken.GetRefreshToken(accessCode, appKey, appSecret)){
-                    Console.WriteLine("Token was successfully generated, where would you like to save the token?");
-                    string saveFilePath = Console.ReadLine() ?? "";
-                    dropboxToken.ConvertTokenJSON(saveFilePath);
-                }
+                GenerateTokens();
+                Console.WriteLine();
                 break;
             case "4":
-                if(CheckNullToken() == false) { break; }
-                dropboxToken?.PrintToken();
+                PrintTokenInformation();
+                Console.WriteLine();
                 break;
             default:
                 Console.WriteLine("Sorry, either it has yet to be implemented or it is not an option");
+                Console.WriteLine();
                 break;
+        }
+    }
+
+
+    /// <summary>
+    /// Commences function of printing token information
+    /// </summary>
+    public void PrintTokenInformation()
+    {
+        if (CheckNullToken() == false) { return; }
+        dropboxToken?.PrintToken();
+    }
+
+    /// <summary>
+    /// Commences function of opening token from given filepath
+    /// </summary>
+    public void OpenJSONToken()
+    {
+        Console.WriteLine("Please enter file path of the json token.");
+        dropboxToken = new DropBoxToken(Console.ReadLine() ?? "");
+        if (dropboxToken.TokenValidation() == false)
+        {
+            Console.WriteLine($"The token was unable to be retrieved. If you would like like, you can select option 2, to generate the token");
+        }
+        else
+        {
+            Console.WriteLine($"The token was able to read, please select option 4 to generate access token.");
+        }
+    }
+
+    /// <summary>
+    /// Commences function of generating token
+    /// </summary>
+    public void GenerateTokens()
+    {
+        Console.WriteLine("To retrieve token, you first need to setup your GitHub account.");
+        Console.WriteLine("To do this, please follow the instructions here: https://github.com/TurnTheKeys/DropBox-Manager");
+        Console.WriteLine("Please enter the app key:");
+        string appKey = Console.ReadLine() ?? "";
+        Console.WriteLine("Please enter the app Secret:");
+        string appSecret = Console.ReadLine() ?? "";
+        Console.WriteLine("Please enter the access code generated:");
+        string accessCode = Console.ReadLine() ?? "";
+        dropboxToken = new DropBoxToken("");
+
+        if (dropboxToken.GetRefreshToken(accessCode, appKey, appSecret))
+        {
+            Console.WriteLine("Token was successfully generated, where would you like to save the token?");
+            string saveFilePath = Console.ReadLine() ?? "";
+            dropboxToken.ConvertTokenJSON(saveFilePath);
         }
     }
 
@@ -72,7 +102,7 @@ class DropBoxApplication
     {
         if (dropboxToken == null)
         {
-            Console.WriteLine("You've yet to setup the token! Please select option 1 first before continuing.");
+            Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
             return false;
         }
         return true;

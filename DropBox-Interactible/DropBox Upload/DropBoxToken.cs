@@ -165,13 +165,7 @@ namespace DropBox_Upload
                     Console.WriteLine($"Response Body: {responseBody}");
 
                     var tokensInformation = JObject.Parse(responseBody);
-                    RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
-                    RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
-                    RefreshToken.uid = tokensInformation["uid"]?.ToString() ?? "";
-                    RefreshToken.account_id = tokensInformation["account_id"]?.ToString() ?? "";
-                    RefreshToken.app_secret = appSecret.ToString() ?? "";
-                    RefreshToken.client_id = appKey.ToString() ?? "";
-                    AccessToken.UpdateInformation(tokensInformation["access_token"]?.ToString()??"", tokensInformation["expires_in"]?.ToString()??"0");
+                    UpdateTokenInformation(tokensInformation, appKey, appSecret);
 
                     return true;
                 }
@@ -187,6 +181,23 @@ namespace DropBox_Upload
                 Console.WriteLine($"Exception: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Updates both refresh token and access token based on given information
+        /// </summary>
+        /// <param name="tokensInformation">Response from response of cURL</param>
+        /// <param name="appKey">App Id of Dropbox account</param>
+        /// <param name="appSecret">App secret of Dropbox account</param>
+        private void UpdateTokenInformation(JObject tokensInformation, string appKey, string appSecret)
+        {
+            RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
+            RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
+            RefreshToken.uid = tokensInformation["uid"]?.ToString() ?? "";
+            RefreshToken.account_id = tokensInformation["account_id"]?.ToString() ?? "";
+            RefreshToken.app_secret = appSecret.ToString() ?? "";
+            RefreshToken.client_id = appKey.ToString() ?? "";
+            AccessToken.UpdateInformation(tokensInformation["access_token"]?.ToString() ?? "", tokensInformation["expires_in"]?.ToString() ?? "0");
         }
 
         /// <summary>
