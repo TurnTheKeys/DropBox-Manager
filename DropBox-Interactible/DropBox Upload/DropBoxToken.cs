@@ -89,17 +89,21 @@ namespace DropBox_Upload
         /// <returns>If function was successful</returns>
         public async Task<bool> GetRefreshTokenAsync(string accessCode, string appKey, string appSecret)
         {
+            Console.WriteLine($"App key: {appKey}");
+            Console.WriteLine($"appSecret: {appSecret}");
+            Console.WriteLine($"accessCode: {accessCode}");
+            Console.WriteLine();
             try
             {
                 var parameters = new Dictionary<string, string>
-                {
-                    { "code", accessCode },
-                    { "grant_type", "authorization_code" },
-                    { "client_id", appKey },
-                    { "client_secret", appSecret }
-                };
+            {
+                { "code", accessCode },
+                { "grant_type", "authorization_code" },
+                { "client_id", appKey },
+                { "client_secret", appSecret }
+            };
 
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropboxapi.com/oauth2/token")
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropbox.com/oauth2/token")
                 {
                     Content = new FormUrlEncodedContent(parameters)
                 };
@@ -107,9 +111,21 @@ namespace DropBox_Upload
                 using (var client = new HttpClient())
                 {
                     HttpResponseMessage response = await client.SendAsync(request);
-                    response.EnsureSuccessStatusCode();
+
+                    // Log status code and reason phrase
+                    Console.WriteLine($"Status Code: {response.StatusCode}");
+                    Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Error Response: {errorResponse}");
+                        return false;
+                    }
 
                     string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response Body: {responseBody}");
+
                     var tokensInformation = JObject.Parse(responseBody);
                     RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
                     RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
@@ -124,6 +140,7 @@ namespace DropBox_Upload
             catch (HttpRequestException e)
             {
                 Console.WriteLine($"Request error: {e.Message}");
+                Console.WriteLine();
                 return false;
             }
             catch (Exception ex)

@@ -48,7 +48,7 @@ class DropBoxApplication
                 string accessCode = Console.ReadLine() ?? "";
                 dropboxToken = new DropBoxToken("");
 
-                if (dropboxToken.GetRefreshToken(appKey, appSecret, accessCode)){
+                if (dropboxToken.GetRefreshToken(accessCode, appKey, appSecret)){
                     Console.WriteLine("Token was successfully generated, where would you like to save the token?");
                     string saveFilePath = Console.ReadLine() ?? "";
                     dropboxToken.ConvertTokenJSON(saveFilePath);
