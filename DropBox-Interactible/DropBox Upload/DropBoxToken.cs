@@ -128,7 +128,7 @@ namespace DropBox_Upload
                 Console.WriteLine("The refresh token has yet to be set up properly");
                 return false;
             }
-            GetAccessTokenAsync();
+            bool accessTokenAttemptRenewal = GetAccessTokenAsync().GetAwaiter().GetResult(); ;
             return true;
         }
 
@@ -186,7 +186,6 @@ namespace DropBox_Upload
                 Console.WriteLine($"Exception: {ex.Message}");
                 return false;
             }
-            return false;
         }
 
         /// <summary>
@@ -300,17 +299,30 @@ namespace DropBox_Upload
             {
                 return false;
             }
-            else
+            string jsonRead = ExtractText();
+            if (!string.IsNullOrEmpty(jsonRead))
             {
-                string json = ExtractText();
-                RefreshToken = JsonConvert.DeserializeObject<DropBoxRefreshToken>(json);
-                if (RefreshToken.AllFieldsFilled() == false)
+                try
                 {
-                    Console.WriteLine("Unable to properly read token");
+                    var tokenHeld = JsonConvert.DeserializeObject<DropBoxRefreshToken>(jsonRead);
+                    if (tokenHeld != null && tokenHeld.AllFieldsFilled())
+                    {
+                        RefreshToken = tokenHeld;
+                    }
+                    return true;
+                }
+                catch (Newtonsoft.Json.JsonException ex)
+                {
+                    Console.WriteLine($"Unable to read token, Json Exception: {ex}");
                     return false;
                 }
-                return true;
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to read token, Exception: {ex}");
+                    return false;
+                }
             }
+            return false;
         }
 
 
