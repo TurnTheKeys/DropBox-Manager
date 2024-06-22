@@ -1,7 +1,8 @@
 # DropBox Manager (in-progress)
 
 ## Goal
-- The goal is to make a program that allows for interaction with GitHub
+- The goal is to make a program that can be used with a GitHub account.
+- This includes generations of tokens in addition to exploring, downloading and uploading files
 
 <details>
   <summary><h2>Intended Functions</h2></summary>
