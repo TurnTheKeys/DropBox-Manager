@@ -129,11 +129,12 @@ namespace DropBox_Upload
                 Console.WriteLine("The refresh token has yet to be set up properly");
                 return false;
             }
-            if (GetAccessTokenAsync().GetAwaiter().GetResult())
+            else if (GetAccessTokenAsync().GetAwaiter().GetResult())
             {
                 Console.WriteLine($"The Access Token was successfully generated and saved.");
                 return true;
             }
+
             Console.WriteLine("Unable to get access token, please recheck token given or generate a new refresh token");
             return false;
         }

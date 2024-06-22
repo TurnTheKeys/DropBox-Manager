@@ -34,7 +34,8 @@ class DropBoxApplication
                 Console.WriteLine();
                 break;
             case "3":
-                dropboxToken.GetAccessToken();
+                GenerateNewAccessToken();
+                Console.WriteLine();
                 break;
             case "4":
                 PrintTokenInformation();
@@ -47,6 +48,24 @@ class DropBoxApplication
         }
     }
 
+    /// <summary>
+    /// Generates new access token if the dropboxToken refresh token has been loaded already
+    /// </summary>
+    public void GenerateNewAccessToken()
+    {
+        if (dropboxToken == null)
+        {
+            Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
+            return;
+        }
+
+        if (dropboxToken.GetAccessToken())
+        {
+            Console.WriteLine("The access token was succesfully generated.");
+            return;
+        }
+        return;
+    }
 
     /// <summary>
     /// Commences function of printing token information
