@@ -59,7 +59,7 @@ class DropBoxApplication
             return;
         }
 
-        if (dropboxToken.GetAccessToken())
+        if (dropboxToken.GetToken("AccessTokenRefresh"))
         {
             Console.WriteLine("The access token was succesfully generated.");
             return;

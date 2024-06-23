@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
+using System.Windows.Markup;
 
 namespace DropBox_Upload
 {
@@ -122,15 +123,13 @@ namespace DropBox_Upload
         /// <summary>
         /// Generates token based option type
         /// </summary>
-        /// <param name="retrievalType">Type of token being retrieved</param>
-        /// <param name="appKey">The app key of dropbox account</param>
-        /// <param name="appSecret">The app secret of dropbox account</param>
+        /// <param name="retrievalType">Type of token being retrieved. Available:"RefreshTokenRefresh", "AccessTokenRefresh" </param>
         /// <returns></returns>
-        public bool GetToken (string retrievalType, string appKey, string appSecret)
+        public bool GetToken (string retrievalType)
         {
             switch (retrievalType)
             {
-                case "RefreshToken":
+                case "RefreshTokenRefresh":
                     {
                         
                         break;
@@ -149,12 +148,19 @@ namespace DropBox_Upload
                         if (attemptConnection.success)
                         {
                             var tokensInformation = JObject.Parse(attemptConnection.responseBody);
+                            string access_token = tokensInformation["refresh_token"]?.ToString() ?? "";
+                            string access_token_expiry = tokensInformation["refresh_token"]?.ToString() ?? "";
+                            AccessToken.UpdateInformation(access_token, access_token_expiry);
                             Console.WriteLine($"The Access Token was successfully generated and saved.");
                             return true;
                         }
 
                         break;
                     }
+                default:
+                    Console.WriteLine("Incorrect token retrieval type.");
+                    return false;
+
             }
 
             return false;
