@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
+using static System.Net.WebRequestMethods;
 
 namespace DropBox_Upload
 {
@@ -34,7 +35,7 @@ namespace DropBox_Upload
 
     internal class DropBoxAccessToken
     {
-        public string access_token { get; set; } = string.Empty;
+        private string access_token { get; set; } = string.Empty;
         public DateTime expires_time { get; set; } = DateTime.Now;
         public string token_type { get; set; } = string.Empty;
 
@@ -119,6 +120,47 @@ namespace DropBox_Upload
         }
 
         /// <summary>
+        /// Generates token based option type
+        /// </summary>
+        /// <param name="retrievalType">Type of token being retrieved</param>
+        /// <param name="appKey">The app key of dropbox account</param>
+        /// <param name="appSecret">The app secret of dropbox account</param>
+        /// <returns></returns>
+        public bool GetToken (string retrievalType, string appKey, string appSecret)
+        {
+            switch (retrievalType)
+            {
+                case "RefreshToken":
+                    {
+                        
+                        break;
+                    }
+                case "AccessTokenRefresh":
+                    {
+                        var parameters = new Dictionary<string, string>
+                        {
+                            {"grant_type", "refresh_token" },
+                            {"refresh_token", RefreshToken.refresh_token},
+                            {"client_id", RefreshToken.account_id },
+                            {"client_secret", RefreshToken.app_secret}
+                        };
+                        string dropBoxURL = "https://api.dropbox.com/oauth2/token";
+                        var attemptConnection = AsyncDropBoxConnection(dropBoxURL, parameters).GetAwaiter().GetResult();
+                        if (attemptConnection.success)
+                        {
+                            var tokensInformation = JObject.Parse(attemptConnection.responseBody);
+                            Console.WriteLine($"The Access Token was successfully generated and saved.");
+                            return true;
+                        }
+
+                        break;
+                    }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Checks to see if access token is still active, if it is no longer active, generate a new access token
         /// </summary>
         /// <returns>Returns true if the access token was succesfully generated, otherwise, return false</returns>
@@ -179,7 +221,13 @@ namespace DropBox_Upload
                     Console.WriteLine($"Response Body: {responseBody}");
 
                     var tokensInformation = JObject.Parse(responseBody);
-                    //AccessToken.UpdateInformation(tokensInformation[])
+                    string access_token = tokensInformation["refresh_token"]?.ToString() ?? "";
+                    string access_token_expiry = tokensInformation["refresh_token"]?.ToString() ?? "";
+                    AccessToken.UpdateInformation(access_token, access_token_expiry);
+
+                    ConvertTokenToJSON("D:\\Desktop\\GitHub Projects\\C# Console App\\Token\\access", "AccessToken", "AccessToken");
+
+                    
                     return true;
                 }
             }
@@ -244,8 +292,7 @@ namespace DropBox_Upload
                     Console.WriteLine($"Response Body: {responseBody}");
 
                     var tokensInformation = JObject.Parse(responseBody);
-                    UpdateTokenInformation(tokensInformation, appKey, appSecret);
-
+                    UpdateRefreshToken(tokensInformation, appKey, appSecret);
                     return true;
                 }
             }
@@ -263,12 +310,63 @@ namespace DropBox_Upload
         }
 
         /// <summary>
+        /// Updates class's response with response from given DropBoxURL and parameters
+        /// </summary>
+        /// <param name="DropBoxURL"></param>
+        /// <param name="parameters">Parameters to be sent through dropbox url</param>
+        /// <returns>Returns tuple. The 'success' and 'responseBody'. For success, returns true if the attempt was successful, otherwise returns false. "responseBody" holds the response.</returns>
+        private async Task<(bool success, string responseBody)> AsyncDropBoxConnection(string DropBoxURL, Dictionary<string,string> parameters)
+        {
+            try
+            {
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, DropBoxURL)
+                {
+                    Content = new FormUrlEncodedContent(parameters)
+                };
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    // Log status code and reason phrase
+                    Console.WriteLine($"Status Code: {response.StatusCode}");
+                    Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Error Response: {errorResponse}");
+                        return (false,"Error");
+                    }
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response Body: {responseBody}");
+
+                    return (false, "responseBody");
+                }
+            }
+
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+                Console.WriteLine();
+                return (false, "Error");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return (false, "Error");
+            }
+
+        }
+
+
+        /// <summary>
         /// Updates both refresh token and access token based on given information
         /// </summary>
         /// <param name="tokensInformation">Response from response of cURL</param>
         /// <param name="appKey">App Id of Dropbox account</param>
         /// <param name="appSecret">App secret of Dropbox account</param>
-        private void UpdateTokenInformation(JObject tokensInformation, string appKey, string appSecret)
+        private void UpdateRefreshToken(JObject tokensInformation, string appKey, string appSecret)
         {
             RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
             RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
@@ -284,12 +382,25 @@ namespace DropBox_Upload
         /// </summary>
         /// <param name="filePath">file path to which the json will be saved</param>
         /// <returns></returns>
-        public bool ConvertTokenJSON(string filePath)
+        public bool ConvertTokenToJSON(string filePath, string fileName, string tokenType)
         {
-            string jsonConvert = System.Text.Json.JsonSerializer.Serialize(RefreshToken, new JsonSerializerOptions { WriteIndented = true });
-            string wholeFilePath = filePath + "\\RefreshToken.json";
-            File.WriteAllTextAsync(wholeFilePath, jsonConvert);
-            if (File.Exists(wholeFilePath))
+            string jsonConvert = String.Empty;
+            switch (tokenType)
+            {
+                case ("RefreshToken"):
+                    jsonConvert = System.Text.Json.JsonSerializer.Serialize(RefreshToken, new JsonSerializerOptions { WriteIndented = true });
+                    break;
+                case ("AccessToken"):
+                    jsonConvert = System.Text.Json.JsonSerializer.Serialize(AccessToken, new JsonSerializerOptions { WriteIndented = true });
+                    break;
+                default:
+                    Console.WriteLine("Wrong token type in ConvertTokenToJson");
+                    return false;
+
+            }
+            string wholeFilePath = filePath + $"\\{fileName}.json";
+            System.IO.File.WriteAllTextAsync(wholeFilePath, jsonConvert);
+            if (System.IO.File.Exists(wholeFilePath))
             {
                 Console.WriteLine($"Succesfully created token at: {wholeFilePath}");
                 return true;
@@ -303,7 +414,7 @@ namespace DropBox_Upload
         /// <returns>Whether or not the token information retrieval was successful</returns>
         private bool ExtractJSONInformation()
         {
-            if (!File.Exists(FilePath))
+            if (!System.IO.File.Exists(FilePath))
             {
                 return false;
             }
@@ -366,7 +477,7 @@ namespace DropBox_Upload
             string extractedText = string.Empty;
             try
             {
-                using (StreamReader reader = File.OpenText(FilePath))
+                using (StreamReader reader = System.IO.File.OpenText(FilePath))
                 {
                     extractedText = reader.ReadToEnd();
                 }

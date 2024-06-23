@@ -112,7 +112,7 @@ class DropBoxApplication
         {
             Console.WriteLine("Token was successfully generated, where would you like to save the token?");
             string saveFilePath = Console.ReadLine() ?? "";
-            dropboxToken.ConvertTokenJSON(saveFilePath);
+            dropboxToken.ConvertTokenToJSON(saveFilePath, "RefreshToken", "Refreshtoken");
         }
     }
 
