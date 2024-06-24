@@ -36,7 +36,7 @@ namespace DropBox_Upload
 
     internal class DropBoxAccessToken
     {
-        private string access_token { get; set; } = string.Empty;
+        public string access_token { get; set; } = string.Empty;
         public DateTime expires_time { get; set; } = DateTime.Now;
         public string token_type { get; set; } = string.Empty;
 
@@ -66,10 +66,27 @@ namespace DropBox_Upload
             return true;
         }
 
-        public void UpdateExpiryTime(int seconds)
+        /// <summary>
+        /// Updates expiry time of the access token
+        /// </summary>
+        /// <param name="seconds">The number of seconds until the access code expires</param>
+        private void UpdateExpiryTime(int seconds)
         {
             DateTime currentTime = DateTime.Now;
             expires_time = currentTime.AddSeconds(seconds);
+        }
+
+        /// <summary>
+        /// Checks to see if access token is okay to use
+        /// </summary>
+        /// <returns>Returns trus if the access token is filled</returns>
+        public bool OkayToUse()
+        {
+            if (access_token == string.Empty)
+            {
+                return false;
+            }
+            return true;
         }
     }
     internal class DropBoxToken
@@ -154,8 +171,8 @@ namespace DropBox_Upload
             if (attemptConnection.success)
             {
                 var tokensInformation = JObject.Parse(attemptConnection.responseBody);
-                string access_token = tokensInformation["refresh_token"]?.ToString() ?? "";
-                string access_token_expiry = tokensInformation["refresh_token"]?.ToString() ?? "";
+                string access_token = tokensInformation["access_token"]?.ToString() ?? "";
+                string access_token_expiry = tokensInformation["expires_in"]?.ToString() ?? "";
                 AccessToken.UpdateInformation(access_token, access_token_expiry);
                 return true;
             }
@@ -348,6 +365,12 @@ namespace DropBox_Upload
                 Console.WriteLine($"App secret: {RefreshToken.app_secret}");
                 Console.WriteLine($"Client Id: {RefreshToken.client_id}");
             }
+            if (AccessToken.OkayToUse())
+            {
+                Console.WriteLine("Access Token details:");
+                Console.WriteLine($"Access token: {AccessToken.access_token}");
+                Console.WriteLine($"Expiry time: {AccessToken.expires_time}");
+            }
             else
             {
                 Console.WriteLine("The token has yet to be entered properly");
@@ -374,6 +397,15 @@ namespace DropBox_Upload
                 Console.WriteLine("File could not be read: " + e.Message);
             }
             return extractedText;
+        }
+
+        /// <summary>
+        /// Checks to see if the access token can still be used
+        /// </summary>
+        /// <returns>Returns true if the access token hasn't expired, otherwise, return false</returns>
+        public bool AccessTokenActive()
+        {
+            return (AccessToken.ExpiryCheck());
         }
 
     }

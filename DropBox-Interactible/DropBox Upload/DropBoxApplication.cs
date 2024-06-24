@@ -64,6 +64,7 @@ class DropBoxApplication
             Console.WriteLine("The access token was succesfully generated.");
             return;
         }
+        Console.WriteLine("The access token was unsuccesfully generated.");
         return;
     }
 
@@ -145,6 +146,7 @@ class DropBoxApplication
         string answer = string.Empty;
         while (true)
         {
+            Console.WriteLine();
             Console.WriteLine("Please select an option from the menu");
             // Display options
             for (int i = 0; i < options.Length; i++)
