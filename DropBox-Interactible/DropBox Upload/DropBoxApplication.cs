@@ -100,7 +100,7 @@ class DropBoxApplication
     public void GenerateRefreshTokens()
     {
         Console.WriteLine("To retrieve token, you first need to setup your GitHub account.");
-        Console.WriteLine("To do this, please follow the instructions here: https://github.com/TurnTheKeys/DropBox-Manager");
+        Console.WriteLine("To do this, please follow the instructions here: https://github.com/TurnTheKeys/DropBox-Manager under Dropbox Setup");
         Console.WriteLine("Please enter the app key:");
         string appKey = Console.ReadLine() ?? "";
         Console.WriteLine("Please enter the app Secret:");
