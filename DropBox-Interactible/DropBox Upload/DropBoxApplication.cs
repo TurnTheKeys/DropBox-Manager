@@ -30,7 +30,7 @@ class DropBoxApplication
                 Console.WriteLine();
                 break;
             case "2":
-                GenerateTokens();
+                GenerateRefreshTokens();
                 Console.WriteLine();
                 break;
             case "3":
@@ -59,7 +59,7 @@ class DropBoxApplication
             return;
         }
 
-        if (dropboxToken.GetToken("AccessTokenRefresh"))
+        if (dropboxToken.GetToken("AccessTokenRefresh", dropboxToken.FillTokenDetails()))
         {
             Console.WriteLine("The access token was succesfully generated.");
             return;
@@ -94,9 +94,9 @@ class DropBoxApplication
     }
 
     /// <summary>
-    /// Commences function of generating token
+    /// Generates refresh token through given user prompts, also generates access token
     /// </summary>
-    public void GenerateTokens()
+    public void GenerateRefreshTokens()
     {
         Console.WriteLine("To retrieve token, you first need to setup your GitHub account.");
         Console.WriteLine("To do this, please follow the instructions here: https://github.com/TurnTheKeys/DropBox-Manager");
@@ -108,12 +108,16 @@ class DropBoxApplication
         string accessCode = Console.ReadLine() ?? "";
         dropboxToken = new DropBoxToken("");
 
-        if (dropboxToken.GetRefreshToken(accessCode, appKey, appSecret))
+        string[] dropboxTokenDetails = new string[] { accessCode, appKey, appSecret };
+
+
+        if (dropboxToken.GetToken("RefreshTokenRefresh", dropboxTokenDetails) == true)
         {
             Console.WriteLine("Token was successfully generated, where would you like to save the token?");
             string saveFilePath = Console.ReadLine() ?? "";
-            dropboxToken.ConvertTokenToJSON(saveFilePath, "RefreshToken", "Refreshtoken");
+            dropboxToken.ConvertTokenToJSON(saveFilePath, "RefreshToken", "RefreshToken");
         }
+        
     }
 
     /// <summary>

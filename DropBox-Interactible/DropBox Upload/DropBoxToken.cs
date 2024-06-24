@@ -102,171 +102,76 @@ namespace DropBox_Upload
                 return true;
         }
 
-        // <summary>
-        /// Generates refresh token and related information for DropBox
-        /// </summary>
-        /// <returns>If function was successful</returns>
-        public bool GetRefreshToken(string accessCode, string appKey, string appSecret)
-        {
-            try
-            {
-                bool result = GetRefreshTokenAsync(accessCode, appKey, appSecret).GetAwaiter().GetResult();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception: {ex.Message}");
-                return false;
-            }
-        }
-
         /// <summary>
         /// Generates token based option type
         /// </summary>
         /// <param name="retrievalType">Type of token being retrieved. Available:"RefreshTokenRefresh", "AccessTokenRefresh" </param>
-        /// <returns></returns>
-        public bool GetToken (string retrievalType)
+        /// /// <param name="RefreshTokenDetails">Details of the refresh token to be used </param>
+        /// <returns>Returns true if the token was successfully refreshed, otherwise returns false</returns>
+        public bool GetToken (string retrievalType, string[] RefreshTokenDetails)
         {
             switch (retrievalType)
             {
                 case "RefreshTokenRefresh":
-                    {
-                        
-                        break;
+                    {  
+                        return (GenerateRefreshToken(RefreshTokenDetails[0], RefreshTokenDetails[1], RefreshTokenDetails[2]));
                     }
                 case "AccessTokenRefresh":
                     {
-                        var parameters = new Dictionary<string, string>
-                        {
-                            {"grant_type", "refresh_token" },
-                            {"refresh_token", RefreshToken.refresh_token},
-                            {"client_id", RefreshToken.account_id },
-                            {"client_secret", RefreshToken.app_secret}
-                        };
-                        string dropBoxURL = "https://api.dropbox.com/oauth2/token";
-                        var attemptConnection = AsyncDropBoxConnection(dropBoxURL, parameters).GetAwaiter().GetResult();
-                        if (attemptConnection.success)
-                        {
-                            var tokensInformation = JObject.Parse(attemptConnection.responseBody);
-                            string access_token = tokensInformation["refresh_token"]?.ToString() ?? "";
-                            string access_token_expiry = tokensInformation["refresh_token"]?.ToString() ?? "";
-                            AccessToken.UpdateInformation(access_token, access_token_expiry);
-                            Console.WriteLine($"The Access Token was successfully generated and saved.");
-                            return true;
-                        }
-
-                        break;
+                        return (RefreshAccessToken());
                     }
                 default:
                     Console.WriteLine("Incorrect token retrieval type.");
                     return false;
 
             }
-
-            return false;
         }
 
         /// <summary>
-        /// Checks to see if access token is still active, if it is no longer active, generate a new access token
+        /// Fills in stored refresh token details
         /// </summary>
-        /// <returns>Returns true if the access token was succesfully generated, otherwise, return false</returns>
-        public bool GetAccessToken()
+        /// <returns>necessary refresh token details stored as a string array</returns>
+        public string[] FillTokenDetails()
         {
-            if (RefreshToken == null)
-            {
-                Console.WriteLine("The refresh token has yet to be set up properly");
-                return false;
-            }
-            else if (GetAccessTokenAsync().GetAwaiter().GetResult())
-            {
-                Console.WriteLine($"The Access Token was successfully generated and saved.");
-                return true;
-            }
-
-            Console.WriteLine("Unable to get access token, please recheck token given or generate a new refresh token");
-            return false;
+            return new string[] {RefreshToken.refresh_token, RefreshToken.account_id, RefreshToken.app_secret};
         }
 
-        public async Task<bool> GetAccessTokenAsync()
+        /// <summary>
+        /// Attempts to generate access token from stored refresh token
+        /// </summary>
+        /// <returns>Returns true if access token was succefully generated</returns>
+        private bool RefreshAccessToken()
         {
-            Console.WriteLine("Attempting to get new access token");
-            try
-            {
-                var parameters = new Dictionary<string, string>
+            var parameters = new Dictionary<string, string>
                 {
                     {"grant_type", "refresh_token" },
                     {"refresh_token", RefreshToken.refresh_token},
                     {"client_id", RefreshToken.account_id },
                     {"client_secret", RefreshToken.app_secret}
                 };
-
-                Console.WriteLine($"refresh_token: {parameters["refresh_token"]}");
-                Console.WriteLine($"Client_id: {parameters["client_id"]}");
-                Console.WriteLine($"Client_secret: {parameters["client_secret"]}");
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropbox.com/oauth2/token")
-                {
-                    Content = new FormUrlEncodedContent(parameters)
-                };
-
-                using (var client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    // Log status code and reason phrase
-                    Console.WriteLine($"Status Code: {response.StatusCode}");
-                    Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        string errorResponse = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error Response: {errorResponse}");
-                        return false;
-                    }
-
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Response Body: {responseBody}");
-
-                    var tokensInformation = JObject.Parse(responseBody);
-                    string access_token = tokensInformation["refresh_token"]?.ToString() ?? "";
-                    string access_token_expiry = tokensInformation["refresh_token"]?.ToString() ?? "";
-                    AccessToken.UpdateInformation(access_token, access_token_expiry);
-
-                    ConvertTokenToJSON("D:\\Desktop\\GitHub Projects\\C# Console App\\Token\\access", "AccessToken", "AccessToken");
-
-                    
-                    return true;
-                }
-            }
-            catch (HttpRequestException e)
+            string dropBoxURL = "https://api.dropbox.com/oauth2/token";
+            var attemptConnection = AsyncDropBoxConnection(dropBoxURL, parameters).GetAwaiter().GetResult();
+            if (attemptConnection.success)
             {
-                Console.WriteLine($"Request error: {e.Message}");
-                Console.WriteLine();
-                return false;
+                var tokensInformation = JObject.Parse(attemptConnection.responseBody);
+                string access_token = tokensInformation["refresh_token"]?.ToString() ?? "";
+                string access_token_expiry = tokensInformation["refresh_token"]?.ToString() ?? "";
+                AccessToken.UpdateInformation(access_token, access_token_expiry);
+                return true;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception: {ex.Message}");
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
-        /// Attempts to use generate the refresh token
+        /// Generates new refresh token from given information
         /// </summary>
-        /// <param name="accessCode">Access code generated for app from DropBox</param>
-        /// <param name="appKey">The app key of the app on DropBox</param>
-        /// <param name="appSecret">The app secret of the app on DropBox</param>
-        /// <returns>If function was successful</returns>
-        public async Task<bool> GetRefreshTokenAsync(string accessCode, string appKey, string appSecret)
+        /// <param name="accessCode">Access code for dropbox account</param>
+        /// <param name="appKey">App key for dropbox account</param>
+        /// <param name="appSecret">App secret for dropbox account</param>
+        /// <returns></returns>
+        private bool GenerateRefreshToken(string accessCode, string appKey, string appSecret)
         {
-            Console.WriteLine("Your entered details are:");
-            Console.WriteLine($"App key: {appKey}");
-            Console.WriteLine($"appSecret: {appSecret}");
-            Console.WriteLine($"accessCode: {accessCode}");
-            Console.WriteLine();
-            try
-            {
-                var parameters = new Dictionary<string, string>
+            var parameters = new Dictionary<string, string>
                 {
                     { "code", accessCode },
                     { "grant_type", "authorization_code" },
@@ -274,46 +179,19 @@ namespace DropBox_Upload
                     { "client_secret", appSecret }
                 };
 
-                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.dropbox.com/oauth2/token")
-                {
-                    Content = new FormUrlEncodedContent(parameters)
-                };
-
-                using (var client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    // Log status code and reason phrase
-                    Console.WriteLine($"Status Code: {response.StatusCode}");
-                    Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        string errorResponse = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error Response: {errorResponse}");
-                        return false;
-                    }
-
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Response Body: {responseBody}");
-
-                    var tokensInformation = JObject.Parse(responseBody);
-                    UpdateRefreshToken(tokensInformation, appKey, appSecret);
-                    return true;
-                }
-            }
-            catch (HttpRequestException e)
+            string dropBoxURL = "https://api.dropbox.com/oauth2/token";
+            var attemptConnection = AsyncDropBoxConnection(dropBoxURL, parameters).GetAwaiter().GetResult();
+            if (attemptConnection.success)
             {
-                Console.WriteLine($"Request error: {e.Message}");
-                Console.WriteLine();
-                return false;
+                var tokensInformation = JObject.Parse(attemptConnection.responseBody);
+                UpdateBothTokens(tokensInformation, appKey, appSecret);
+                Console.WriteLine("Refresh Token Generation was successful");
+                return true;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception: {ex.Message}");
-                return false;
-            }
+            Console.WriteLine("Refresh Token Generation was unsuccessful");
+            return false;
         }
+ 
 
         /// <summary>
         /// Updates class's response with response from given DropBoxURL and parameters
@@ -347,7 +225,7 @@ namespace DropBox_Upload
                     string responseBody = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Response Body: {responseBody}");
 
-                    return (false, "responseBody");
+                    return (true, responseBody);
                 }
             }
 
@@ -372,7 +250,7 @@ namespace DropBox_Upload
         /// <param name="tokensInformation">Response from response of cURL</param>
         /// <param name="appKey">App Id of Dropbox account</param>
         /// <param name="appSecret">App secret of Dropbox account</param>
-        private void UpdateRefreshToken(JObject tokensInformation, string appKey, string appSecret)
+        private void UpdateBothTokens(JObject tokensInformation, string appKey, string appSecret)
         {
             RefreshToken.refresh_token = tokensInformation["refresh_token"]?.ToString() ?? "";
             RefreshToken.scope = tokensInformation["scope"]?.ToString() ?? "";
@@ -384,10 +262,12 @@ namespace DropBox_Upload
         }
 
         /// <summary>
-        /// Converts token information into a json so that it can be reused
+        /// Converts stored token information into a json
         /// </summary>
-        /// <param name="filePath">file path to which the json will be saved</param>
-        /// <returns></returns>
+        /// <param name="filePath">path to store json file</param>
+        /// <param name="fileName">What to label the file</param>
+        /// <param name="tokenType">The token type, Available options: "RefreshToken", "AccessToken"</param>
+        /// <returns>Returns true if the JSON was successfully generated, otherwise, returns false</returns>
         public bool ConvertTokenToJSON(string filePath, string fileName, string tokenType)
         {
             string jsonConvert = String.Empty;
@@ -458,6 +338,7 @@ namespace DropBox_Upload
         {
             if (RefreshToken.AllFieldsFilled() && RefreshToken != null)
             {
+                Console.WriteLine("Refresh Token details:");
                 Console.WriteLine($"The stored values for token are:");
                 Console.WriteLine($"Refresh Token: {RefreshToken.refresh_token}");
                 Console.WriteLine($"Account Id: {RefreshToken.account_id}");
@@ -495,23 +376,5 @@ namespace DropBox_Upload
             return extractedText;
         }
 
-
-        /// <summary>
-        /// Exports JSON location to a given location
-        /// </summary>
-        /// <returns>Whether or not the JSON was successfully created</returns>
-        private bool ExportJSONToken()
-        {
-            return false; 
-        } 
-
-        /// <summary>
-        /// Generates access token to be used for dropbox, also updates expiry time of access code
-        /// </summary>
-        /// <returns>If the access token was succesfully generated</returns>
-        private bool GenerateAccessToken()
-        {
-            return false;
-        }
     }
 }
