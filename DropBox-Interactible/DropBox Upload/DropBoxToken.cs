@@ -15,6 +15,7 @@ using System.Windows.Markup;
 
 namespace DropBox_Upload
 {
+
     internal class DropBoxRefreshToken
     {
         public string refresh_token { get; set; } = string.Empty;
