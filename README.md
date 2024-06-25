@@ -22,8 +22,8 @@
     - Generating Refresh Token
     - Generating Access Token
   - Currently Working on
-    - Retrieving directory files and folders
-      - Store list of information in its own class
+    - Upload of files
+    - Download of files
   - Working on Next:
     - Printing to console: Directory files and folders, Dropbox file ID
     - Downloading files
