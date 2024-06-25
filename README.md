@@ -26,8 +26,6 @@
     - Download of files
   - Working on Next:
     - Printing to console: Directory files and folders, Dropbox file ID
-    - Downloading files
-    - Uploading files
 
 </details>
 <details>
