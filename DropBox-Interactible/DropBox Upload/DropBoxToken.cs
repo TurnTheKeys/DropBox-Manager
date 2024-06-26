@@ -10,7 +10,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
-using static System.Net.WebRequestMethods;
 using System.Windows.Markup;
 
 namespace DropBox_Upload
