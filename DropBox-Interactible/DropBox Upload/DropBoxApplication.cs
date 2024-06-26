@@ -59,7 +59,7 @@ class DropBoxApplication
             return;
         }
 
-        if (dropboxToken.GetToken("AccessTokenRefresh", dropboxToken.FillTokenDetails()))
+        if (dropboxToken.GenerateToken("AccessTokenRefresh", dropboxToken.FillTokenDetails()))
         {
             Console.WriteLine("The access token was succesfully generated.");
             return;
@@ -112,7 +112,7 @@ class DropBoxApplication
         string[] dropboxTokenDetails = new string[] { accessCode, appKey, appSecret };
 
 
-        if (dropboxToken.GetToken("RefreshTokenRefresh", dropboxTokenDetails) == true)
+        if (dropboxToken.GenerateToken("RefreshTokenRefresh", dropboxTokenDetails) == true)
         {
             Console.WriteLine("Token was successfully generated, where would you like to save the token?");
             string saveFilePath = Console.ReadLine() ?? "";

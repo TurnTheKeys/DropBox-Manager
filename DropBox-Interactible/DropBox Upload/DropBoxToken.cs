@@ -127,7 +127,7 @@ namespace DropBox_Upload
         /// <param name="retrievalType">Type of token being retrieved. Available:"RefreshTokenRefresh", "AccessTokenRefresh" </param>
         /// /// <param name="RefreshTokenDetails">Details of the refresh token to be used </param>
         /// <returns>Returns true if the token was successfully refreshed, otherwise returns false</returns>
-        public bool GetToken (string retrievalType, string[] RefreshTokenDetails)
+        public bool GenerateToken (string retrievalType, string[] RefreshTokenDetails)
         {
             switch (retrievalType)
             {
@@ -355,9 +355,33 @@ namespace DropBox_Upload
         /// Checks to see if the access token can still be used
         /// </summary>
         /// <returns>Returns true if the access token hasn't expired, otherwise, return false</returns>
-        public bool AccessTokenActive()
+        private bool AccessTokenActive()
         {
             return (AccessToken.ExpiryCheck());
+        }
+
+        /// <summary>
+        /// First checks if the access token is still active, if it isn't then generates a new one.
+        /// Then returns access token if successful.
+        /// </summary>
+        /// <returns>If successfully retrieves access token, returns true and accessToken, otherwise, returns false and error text.</returns>
+        public (bool success, string accessToken) RetrieveAccessToken()
+        {
+            if (!AccessTokenActive())
+            {
+                Console.WriteLine("The access token has expired, retrieving a new one.");
+                if (!RefreshAccessToken())
+                {
+                    Console.WriteLine("There was a problem generating a new access token.");
+                    return (false, "Retrieval Error");
+                }
+                else
+                {
+                    Console.WriteLine("A new access token has successfully be generated");
+                }
+            }
+            Console.WriteLine("The access token has successfully been retrieved");
+            return (true, AccessToken.access_token);
         }
 
     }

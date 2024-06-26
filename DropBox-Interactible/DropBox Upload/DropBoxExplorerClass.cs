@@ -78,6 +78,13 @@ namespace DropBox_Upload
         /// <returns>Returns true if the file was succefully downloaded, otherwise, returns false</returns>
         public bool DownloadFile (DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath)
         {
+            Dictionary<string,string> parameters = new Dictionary<string, string>
+                {
+                    {"Authorization", $"Bearer {token.g}" },
+                    {"refresh_token", RefreshToken.refresh_token},
+                    {"client_id", RefreshToken.account_id },
+                    {"client_secret", RefreshToken.app_secret}
+                };
             return false;
         }
     }
