@@ -68,7 +68,7 @@
   - <img src="https://github.com/TurnTheKeys/DropBox-Manager/assets/166112225/05afc811-c511-4d92-b378-5391367090c8" width="400">
 
   <details>
-    <summary>Upload Refresh Token</summary>
+    <summary>1) Upload Refresh Token</summary>
     
   - This function allows for the user to add a filepath to the console to the json that contains the refresh token.
   - Once a filepath has been added, it will show if the json has been successfully read. 
@@ -79,5 +79,18 @@
     - If unsuccessful, the program will recommend generating a new refresh token (option 2 of the menu).
       - `The token was unable to be retrieved. If you would like like, you can select option 2, to generate the token.` 
   </details>
+<details>
+  <summary>3) Generate new access token from refresh token</summary>
+  
+- This function allows for a new access token to be generated using a given refresh token.
+- If the access token could not be generated it will print:
+  - `The access token was unsuccesfully generated.`
+  - This could be because a refresh token hasn't been given yet.
+- If the access token could be generated it will print:
+  - `The expiry time for your new access token is: 28/06/2024 1:40:00 PM`
+  - `The access token was succesfully generated.`
+</details>
+
+  
 </details>
 
