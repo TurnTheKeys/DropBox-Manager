@@ -9,6 +9,7 @@ class DropBoxApplication
     public DropBoxApplication()
     {
         Console.WriteLine("Hello, this program allows for files to be downloaded or uploaded to DropBox");
+        dropBoxExplorerClass = new DropBoxExplorerClass();
         while (true)
         {
             ProgramMenu();
@@ -21,14 +22,13 @@ class DropBoxApplication
     public void ProgramMenu()
     {
         string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token", "Generate new access token from refresh token" , "Print token details", "Upload File", "Download File" };
-        string[] options = { "1", "2", "3", "4" };
+        string[] options = { "1", "2", "3", "4", "5", "6" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
 
         switch (optionSelected)
         {
             case "1":
                 OpenJSONToken();
-                Console.WriteLine();
                 break;
             case "2":
                 GenerateRefreshTokens();
@@ -40,6 +40,20 @@ class DropBoxApplication
                 break;
             case "4":
                 PrintTokenInformation();
+                Console.WriteLine();
+                break;
+            case "6":
+                if (dropboxToken == null)
+                {
+                    Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
+                    return;
+                }
+                Console.WriteLine();
+                Console.WriteLine("Please enter the filepath or id of the file to be downloaded:");
+                string fileReference = Console.ReadLine() ?? "";
+                Console.WriteLine("Please enter the filepath for where the file will be saved to:");
+                string downloadToFilePath = Console.ReadLine() ?? "";
+                dropBoxExplorerClass.DownloadFileDropBox(dropboxToken, fileReference, downloadToFilePath);
                 Console.WriteLine();
                 break;
             default:
