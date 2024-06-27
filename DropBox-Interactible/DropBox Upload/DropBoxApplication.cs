@@ -21,7 +21,7 @@ class DropBoxApplication
     /// </summary>
     public void ProgramMenu()
     {
-        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token", "Generate new access token from refresh token" , "Print token details", "Upload File", "Download File" };
+        string[] optionsAvaliable = { "Upload Refresh Token", "Generate Refresh Token", "Generate new access token from refresh token" , "Print token details", "Upload File", "Download File from file path" };
         string[] options = { "1", "2", "3", "4", "5", "6" };
         string optionSelected = UserAnswer(optionsAvaliable,options);
 
@@ -43,17 +43,7 @@ class DropBoxApplication
                 Console.WriteLine();
                 break;
             case "6":
-                if (dropboxToken == null)
-                {
-                    Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
-                    return;
-                }
-                Console.WriteLine();
-                Console.WriteLine("Please enter the filepath or id of the file to be downloaded:");
-                string fileReference = Console.ReadLine() ?? "";
-                Console.WriteLine("Please enter the filepath for where the file will be saved to:");
-                string downloadToFilePath = Console.ReadLine() ?? "";
-                dropBoxExplorerClass.DownloadFileDropBox(dropboxToken, fileReference, downloadToFilePath);
+                DownloadFileFilePath();
                 Console.WriteLine();
                 break;
             default:
@@ -63,6 +53,25 @@ class DropBoxApplication
         }
     }
 
+    /// <summary>
+    /// Downloads file from given DropBox file path
+    /// </summary>
+    public void DownloadFileFilePath()
+    {
+        if (dropboxToken == null || dropBoxExplorerClass == null)
+        {
+            Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
+            return;
+        }
+        Console.WriteLine();
+        Console.WriteLine("Please enter the filepath or id of the file to be downloaded:");
+        string fileReference = Console.ReadLine() ?? "";
+        Console.WriteLine("Please enter the filepath for where the file will be saved to:");
+        string downloadToFilePath = Console.ReadLine() ?? "";
+        Console.WriteLine("Please enter the name you wish to give to the file along with extention (e.g. file.txt):");
+        string fileName = Console.ReadLine() ?? "";
+        dropBoxExplorerClass.DownloadFileDropBox(dropboxToken, fileReference, downloadToFilePath, fileName);
+    }
     /// <summary>
     /// Generates new access token if the dropboxToken refresh token has been loaded already
     /// </summary>

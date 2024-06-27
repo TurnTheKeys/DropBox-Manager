@@ -366,7 +366,7 @@ namespace DropBox_Upload
         /// <returns>If successfully retrieves access token, returns true and accessToken, otherwise, returns false and error text.</returns>
         public (bool success, string accessToken) RetrieveAccessToken()
         {
-            if (!AccessTokenActive())
+            if (AccessTokenActive() == false)
             {
                 Console.WriteLine("The access token has expired, retrieving a new one.");
                 if (!RefreshAccessToken())
@@ -380,6 +380,7 @@ namespace DropBox_Upload
                 }
             }
             Console.WriteLine("The access token has successfully been retrieved");
+            Console.WriteLine();
             return (true, AccessToken.access_token);
         }
 

@@ -81,9 +81,9 @@ namespace DropBox_Upload
         /// <param name="dropBoxDownloadFilePath">The filepath or ID of the file to be downloaded from DropBox</param>
         /// <param name="saveToLocalFilePath">The location of where the file will be download to</param>
         /// <returns>Returns true if the file was succefully downloaded, otherwise, returns false</returns>
-        public bool DownloadFileDropBox(DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath)
+        public bool DownloadFileDropBox(DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath, string fileName)
         {
-            if (DownloadFileProcess(token, dropBoxDownloadFilePath, saveToLocalFilePath).GetAwaiter().GetResult() == true)
+            if (DownloadFileProcess(token, dropBoxDownloadFilePath, saveToLocalFilePath, fileName).GetAwaiter().GetResult() == true)
             {
                 Console.WriteLine("The file was successfully downloaded!");
                 return true;
@@ -93,34 +93,28 @@ namespace DropBox_Upload
         }
 
         /// <summary>
-        /// Downloads specified file from dropbox filepath to the given local filepath.
+        /// Downloads specified file from Dropbox filepath to the given local filepath.
         /// </summary>
-        /// <param name="token">The token for access to the DropBox Account</param>
-        /// <param name="dropBoxDownloadFilePath">The filepath or ID of the file to be downloaded from DropBox</param>
-        /// <param name="saveToLocalFilePath">The location of where the file will be download to</param>
+        /// <param name="token">The token for access to the Dropbox Account</param>
+        /// <param name="dropBoxDownloadFilePath">The filepath or ID of the file to be downloaded from Dropbox</param>
+        /// <param name="saveToLocalFilePath">The location where the file will be downloaded to</param>
+        /// <param name="fileName">The filename to save the downloaded file as</param>
         /// <returns>Returns true if the file was successfully downloaded, otherwise, returns false</returns>
-        public async Task<bool> DownloadFileProcess(DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath)
+        public async Task<bool> DownloadFileProcess(DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath, string fileName)
         {
             var accessTokenRetrieve = token.RetrieveAccessToken();
-            string dropBoxDownloadFilePathConverted = JsonSerializer.Serialize(new { path = dropBoxDownloadFilePath });
-            Console.WriteLine($"The dropbox url used is: {dropBoxDownloadFilePathConverted}");
-            if (accessTokenRetrieve.success == false)
+            string normalizedDropBoxDownloadFilePath = dropBoxDownloadFilePath.Replace("\\", "/");
+            string dropBoxDownloadFilePathConverted = JsonSerializer.Serialize(new { path = normalizedDropBoxDownloadFilePath.StartsWith("/") ? normalizedDropBoxDownloadFilePath : "/" + normalizedDropBoxDownloadFilePath });
+            Console.WriteLine($"The Dropbox URL used is: {dropBoxDownloadFilePathConverted}");
+            if (!accessTokenRetrieve.success)
             {
                 Console.WriteLine("Unable to download file: Failed to retrieve access token.");
                 return false;
             }
 
-            var parameters = new Dictionary<string, string>
-                {
-                    { "Authorization", $"Bearer {accessTokenRetrieve.accessToken}" },
-                    {"Dropbox-API-Arg:", dropBoxDownloadFilePathConverted}
-                };
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/download")
-            {
-                Content = new FormUrlEncodedContent(parameters)
-            };
-
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/download");
+            request.Headers.Add("Authorization", $"Bearer {accessTokenRetrieve.accessToken}");
+            request.Headers.Add("Dropbox-API-Arg", dropBoxDownloadFilePathConverted);
 
             try
             {
@@ -134,12 +128,12 @@ namespace DropBox_Upload
                     }
 
                     using (var stream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = new FileStream(saveToLocalFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                    using (var fileStream = new FileStream(Path.Combine(saveToLocalFilePath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                     {
                         await stream.CopyToAsync(fileStream);
                     }
 
-                    Console.WriteLine($"File successfully downloaded to: {saveToLocalFilePath}");
+                    Console.WriteLine($"File successfully downloaded to: {Path.Combine(saveToLocalFilePath, fileName)}");
                     return true;
                 }
             }
@@ -154,5 +148,6 @@ namespace DropBox_Upload
                 return false;
             }
         }
+
     }
 }
