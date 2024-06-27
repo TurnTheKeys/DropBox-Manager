@@ -7,16 +7,16 @@
       "RelativeMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|solutionrelative:dropbox upload\\dropboxexplorerclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|d:\\desktop\\github projects\\c# console app\\dropbox-interactible\\dropbox-interactible\\dropbox upload\\dropboxtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|solutionrelative:dropbox upload\\dropboxtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|d:\\desktop\\github projects\\c# console app\\dropbox-interactible\\dropbox-interactible\\dropbox upload\\dropboxapplication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|solutionrelative:dropbox upload\\dropboxapplication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|d:\\desktop\\github projects\\c# console app\\dropbox-interactible\\dropbox-interactible\\dropbox upload\\httppostrequestclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|solutionrelative:dropbox upload\\httppostrequestclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|d:\\desktop\\github projects\\c# console app\\dropbox-interactible\\dropbox-interactible\\dropbox upload\\dropboxtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8837391C-F8BD-428A-8D36-76FDA1F37AB8}|DropBox Upload\\DropBox Upload.csproj|solutionrelative:dropbox upload\\dropboxtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -44,27 +44,27 @@
               "RelativeDocumentMoniker": "DropBox Upload\\DropBoxExplorerClass.cs",
               "ToolTip": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBoxExplorerClass.cs",
               "RelativeToolTip": "DropBox Upload\\DropBoxExplorerClass.cs",
-              "ViewState": "AQIAAEgAAAAAAAAAAAAuwFoAAAA6AAAA",
+              "ViewState": "AQIAAE4AAAAAAAAAAAAuwAsAAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-25T11:12:19.758Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "DropBoxToken.cs",
               "DocumentMoniker": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBoxToken.cs",
               "RelativeDocumentMoniker": "DropBox Upload\\DropBoxToken.cs",
               "ToolTip": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBoxToken.cs",
               "RelativeToolTip": "DropBox Upload\\DropBoxToken.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAXAAAA",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAAAsAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-17T04:33:14.472Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "HTTPPostRequestClass.cs",
               "DocumentMoniker": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\HTTPPostRequestClass.cs",
               "RelativeDocumentMoniker": "DropBox Upload\\HTTPPostRequestClass.cs",
@@ -77,13 +77,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "DropBoxApplication.cs",
               "DocumentMoniker": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBoxApplication.cs",
               "RelativeDocumentMoniker": "DropBox Upload\\DropBoxApplication.cs",
               "ToolTip": "D:\\Desktop\\GitHub Projects\\C# Console App\\DropBox-Interactible\\DropBox-Interactible\\DropBox Upload\\DropBoxApplication.cs",
               "RelativeToolTip": "DropBox Upload\\DropBoxApplication.cs",
-              "ViewState": "AQIAAHUAAAAAAAAAAAAiwIgAAAAAAAAA",
+              "ViewState": "AQIAACwAAAAAAAAAAAAYwAgAAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-17T04:24:16.161Z",
               "EditorCaption": ""

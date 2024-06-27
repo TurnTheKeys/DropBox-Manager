@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 class DropBoxApplication
 {
     DropBoxToken? dropboxToken;
+    DropBoxExplorerClass? dropBoxExplorerClass;
     public DropBoxApplication()
     {
         Console.WriteLine("Hello, this program allows for files to be downloaded or uploaded to DropBox");

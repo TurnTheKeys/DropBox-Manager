@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Net.Http.Headers;
 
 namespace DropBox_Upload
 {
@@ -15,6 +16,7 @@ namespace DropBox_Upload
         List<string> Directory = new List<string>();
 
         private const int uploadChunkSize = 150 * 1024 * 1024; // 150 MiB
+        private static readonly HttpClient client = new HttpClient();
 
         /// <summary>
         /// Starts and finishes file upload session to DropBox
@@ -79,7 +81,7 @@ namespace DropBox_Upload
         /// <param name="dropBoxDownloadFilePath">The location of the file to be downloaded from</param>
         /// <param name="saveToLocalFilePath">The location of where the file will be download to</param>
         /// <returns>Returns true if the file was succefully downloaded, otherwise, returns false</returns>
-        public bool DownloadFile (DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath)
+        public async Task<bool> DownloadFile (DropBoxToken token, string dropBoxDownloadFilePath, string saveToLocalFilePath)
         {
             var accessTokenRetrieve = token.RetrieveAccessToken();
             if (accessTokenRetrieve.success == false)
@@ -88,14 +90,23 @@ namespace DropBox_Upload
                 return false;
             }
 
-            string convertedFilePath = ConvertToJsonFormat(dropBoxDownloadFilePath);
+            // Set headers
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessTokenRetrieve.accessToken);
+            string dropboxApiArg = JsonSerializer.Serialize(new { path = dropBoxDownloadFilePath });
 
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/download");
+            request.Headers.Add("Dropbox-API-Arg", dropboxApiArg);
 
-            Dictionary<string,string> parameters = new Dictionary<string, string>
+            using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
+            {
+                response.EnsureSuccessStatusCode();
+                using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var fileStream = new FileStream(saveToLocalFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                 {
-                    {"Authorization", $"Bearer {accessTokenRetrieve.accessToken}" },
-                    {"Dropbox-API-Arg", }
-                };
+                    await stream.CopyToAsync(fileStream);
+                }
+            }
+
             return false;
         }
     }
