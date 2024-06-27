@@ -61,5 +61,23 @@
   - Record the access code
 
 </details>
+<details>
+  <summary><h2>How to use the program</h2></summary>
+  
+  - This section will explain how to use the program
+  - <img src="https://github.com/TurnTheKeys/DropBox-Manager/assets/166112225/05afc811-c511-4d92-b378-5391367090c8" width="400">
 
+  <details>
+    <summary>Upload Refresh Token</summary>
+    
+  - This function allows for the user to add a filepath to the console to the json that contains the refresh token.
+  - Once a filepath has been added, it will show if the json has been successfully read. 
+    - If successful, an access token will also be generated so that files can be uploaded and downloaded from DropBox.
+      - This will print out the expiry time of the new access token
+        - `The expiry time for your new access token is: 28/06/2024 1:40:00 PM`
+        - `The access token was succesfully generated.`
+    - If unsuccessful, the program will recommend generating a new refresh token (option 2 of the menu).
+      - `The token was unable to be retrieved. If you would like like, you can select option 2, to generate the token.` 
+  </details>
+</details>
 
