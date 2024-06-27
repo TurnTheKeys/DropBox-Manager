@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DropBox Upload")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09c0a94de1743439b3e9ef76250b93ea03d21173")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+34d6c3c74db54d8e271074a1ba3b39c1db92095f")]
 [assembly: System.Reflection.AssemblyProductAttribute("DropBox Upload")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DropBox Upload")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

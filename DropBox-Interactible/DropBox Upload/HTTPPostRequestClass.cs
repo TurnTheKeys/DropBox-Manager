@@ -32,18 +32,18 @@ namespace DropBox_Upload
                     HttpResponseMessage response = await client.SendAsync(request);
 
                     // Log status code and reason phrase
-                    Console.WriteLine($"Status Code: {response.StatusCode}");
-                    Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+                    //Console.WriteLine($"Status Code: {response.StatusCode}");
+                    //Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
 
                     if (!response.IsSuccessStatusCode)
                     {
                         string errorResponse = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error Response: {errorResponse}");
+                        //Console.WriteLine($"Error Response: {errorResponse}");
                         return (false, "Error");
                     }
 
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Response Body: {responseBody}");
+                    //Console.WriteLine($"Response Body: {responseBody}");
 
                     return (true, responseBody);
                 }
@@ -51,13 +51,12 @@ namespace DropBox_Upload
 
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Request error: {e.Message}");
-                Console.WriteLine();
+                //Console.WriteLine($"Request error: {e.Message}");
                 return (false, "Error");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
+                //Console.WriteLine($"Exception: {ex.Message}");
                 return (false, "Error");
             }
 

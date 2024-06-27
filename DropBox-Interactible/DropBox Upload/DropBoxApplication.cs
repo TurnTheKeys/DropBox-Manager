@@ -13,6 +13,7 @@ class DropBoxApplication
         while (true)
         {
             ProgramMenu();
+            Console.WriteLine();
         }
     }
 
@@ -32,23 +33,18 @@ class DropBoxApplication
                 break;
             case "2":
                 GenerateRefreshTokens();
-                Console.WriteLine();
                 break;
             case "3":
                 GenerateNewAccessToken();
-                Console.WriteLine();
                 break;
             case "4":
                 PrintTokenInformation();
-                Console.WriteLine();
                 break;
             case "6":
                 DownloadFileFilePath();
-                Console.WriteLine();
                 break;
             default:
                 Console.WriteLine("Sorry, either it has yet to be implemented or it is not an option");
-                Console.WriteLine();
                 break;
         }
     }
@@ -63,7 +59,6 @@ class DropBoxApplication
             Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
             return;
         }
-        Console.WriteLine();
         Console.WriteLine("Please enter the filepath or id of the file to be downloaded:");
         string fileReference = Console.ReadLine() ?? "";
         Console.WriteLine("Please enter the filepath for where the file will be saved to:");
@@ -102,19 +97,19 @@ class DropBoxApplication
     }
 
     /// <summary>
-    /// Commences function of opening token from given filepath
+    /// Commences function of reading refresh token from given filepath, if successfully read, generates new access token
     /// </summary>
     public void OpenJSONToken()
     {
         Console.WriteLine("Please enter file path of the json token.");
         dropboxToken = new DropBoxToken(Console.ReadLine() ?? "");
-        if (dropboxToken.TokenValidation() == false)
+        if (!dropboxToken.TokenValidation())
         {
             Console.WriteLine($"The token was unable to be retrieved. If you would like like, you can select option 2, to generate the token");
         }
         else
         {
-            Console.WriteLine($"The token was able to read, please select option 3 to generate access token.");
+            GenerateNewAccessToken();
         }
     }
 
@@ -170,7 +165,6 @@ class DropBoxApplication
         string answer = string.Empty;
         while (true)
         {
-            Console.WriteLine();
             Console.WriteLine("Please select an option from the menu");
             // Display options
             for (int i = 0; i < options.Length; i++)

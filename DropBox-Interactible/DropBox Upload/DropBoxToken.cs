@@ -58,12 +58,7 @@ namespace DropBox_Upload
         /// <returns>Returns true if access token is still fresh, otherwise returns false</returns>
         public bool ExpiryCheck()
         {
-            DateTime currentTime = DateTime.Now;
-            if (currentTime > expires_time)
-            {
-                return false;
-            }
-            return true;
+            return DateTime.Now > expires_time;
         }
 
         /// <summary>
@@ -74,6 +69,7 @@ namespace DropBox_Upload
         {
             DateTime currentTime = DateTime.Now;
             expires_time = currentTime.AddSeconds(seconds);
+            Console.WriteLine($"The expiry time for your new access token is: {expires_time}");
         }
 
         /// <summary>
@@ -113,11 +109,7 @@ namespace DropBox_Upload
         /// <returns>If validation was successful</returns>
         public bool TokenValidation()
         {
-            if (ExtractJSONInformation() == false)
-            {
-                return false;
-            }
-                return true;
+            return ExtractJSONInformation();
         }
 
         /// <summary>
@@ -366,9 +358,9 @@ namespace DropBox_Upload
         /// <returns>If successfully retrieves access token, returns true and accessToken, otherwise, returns false and error text.</returns>
         public (bool success, string accessToken) RetrieveAccessToken()
         {
-            if (AccessTokenActive() == false)
+            if (!AccessTokenActive() || AccessToken.access_token == "")
             {
-                Console.WriteLine("The access token has expired, retrieving a new one.");
+                Console.WriteLine("The access token has expired or hasn't been generated, retrieving a new one.");
                 if (!RefreshAccessToken())
                 {
                     Console.WriteLine("There was a problem generating a new access token.");
@@ -376,11 +368,11 @@ namespace DropBox_Upload
                 }
                 else
                 {
-                    Console.WriteLine("A new access token has successfully be generated");
+                    Console.WriteLine("A new access token has successfully been generated");
                 }
             }
+
             Console.WriteLine("The access token has successfully been retrieved");
-            Console.WriteLine();
             return (true, AccessToken.access_token);
         }
 
