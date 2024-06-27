@@ -21,9 +21,10 @@
     - Opening JSON token and outputting JSON token
     - Generating Refresh Token
     - Generating Access Token
+    - Download of files (through filepath)
   - Currently Working on
     - Upload of files
-    - Download of files
+    - Feature Manual
   - Working on Next:
     - Printing to console: Directory files and folders, Dropbox file ID
 
