@@ -24,6 +24,10 @@ namespace DropBox_Upload
         public string app_secret { get; set; } = string.Empty;
         public string client_id { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Checks to see if all the fields of the token have been filled out
+        /// </summary>
+        /// <returns>If the token fields are field out. returns true, otherwise returns false.</returns>
         public bool AllFieldsFilled()
         {
             if (refresh_token == string.Empty || scope == string.Empty || uid == string.Empty || account_id == string.Empty || account_id == string.Empty || app_secret == string.Empty || client_id == string.Empty)

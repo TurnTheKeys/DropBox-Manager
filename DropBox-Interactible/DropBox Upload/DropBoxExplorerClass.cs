@@ -15,23 +15,70 @@ namespace DropBox_Upload
         private HTTPPostRequest HTTPPostRequest = new HTTPPostRequest();
         List<string> Directory = new List<string>();
 
-        private const int uploadChunkSize = 150 * 1024 * 1024; // 150 MiB
+        private const int uploadChunkSize = 150 * 1024 * 1024; // upload chunk size limit set by Dropbox is 150 MiB
         private static readonly HttpClient client = new HttpClient();
 
-        /// <summary>
-        /// Starts and finishes file upload session to DropBox
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="saveWhere"></param>
-        /// <param name="token"></param>
-        /// <returns>Returns true if the upload was successful, otherwise, returns false</returns>
-        public bool FileUploadSession(string filePath, string saveWhere, DropBoxToken token)
+        public async Task<bool> UploadToDropBox(DropBoxToken accessToken, string filePath, string saveWhere)
         {
+            // Remember that filepaths are formatted like so '/backups/'
+            // filePath needs to also include the file it's being saved as, like '/backups/example.sql'
+
+            // filePath is where the file that needs to be uploaded is located
+            // saveWhere is where the file is to be saved on DropBox
+
             if (!File.Exists(filePath))
             {
-                Console.WriteLine("The file was unable to be found, please check filepath");
+                Console.WriteLine($"File does not exist: {filePath}");
                 return false;
             }
+
+            string uploadSessionId = await UploadSessionStart(accessToken.RetrieveAccessToken().accessToken);
+
+            if (uploadSessionId == null)
+            {
+                Console.WriteLine($"Failed to commence upload session for file: {filePath}");
+                return false;
+            }
+
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                long fileSize = fileStream.Length;
+                long offset = 0;
+
+                while (offset < fileSize)
+                {
+                    long remainingBytes = fileSize - offset;
+                    int bytesToRead = (int)Math.Min(uploadChunkSize, remainingBytes);
+                    byte[] buffer = new byte[bytesToRead];
+                    int bytesRead = await fileStream.ReadAsync(buffer, 0, bytesToRead);
+
+                    if (remainingBytes <= uploadChunkSize)
+                    {
+                        var result = await UploadSessionFinish(accessToken.RetrieveAccessToken().accessToken, uploadSessionId, buffer, offset, saveWhere);
+                        if (result)
+                        {
+                            Console.WriteLine("File uploaded successfully.");
+                            return result;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Failed to finish upload session.");
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        bool success = await UploadSessionAppend(accessToken.RetrieveAccessToken().accessToken, uploadSessionId, buffer, offset);
+                        if (!success)
+                        {
+                            Console.WriteLine("Failed to append data to upload session.");
+                            break;
+                        }
+                        offset += bytesRead;
+                    }
+                }
+            }
+
             return true;
         }
 
@@ -40,9 +87,10 @@ namespace DropBox_Upload
         /// </summary>
         /// <param name="token">The token for the dropbox account</param>
         /// <returns>Returns the id of the dropbox upload session, otherwise, returns false</returns>
-        public string UploadSessionStart (DropBoxToken token)
+        private async Task<string> UploadSessionStart (string accessToken)
         {
             string UploadSessionID = "";
+            
             return UploadSessionID;
         }
 
@@ -54,7 +102,7 @@ namespace DropBox_Upload
         /// <param name="appendedData">The data to be uploaded</param>
         /// <param name="offset">The data offset</param>
         /// <returns>Returns true if the data was succesfully appended to the upload session, otherwise, returns false</returns>
-        public bool UploadSessionAppend (DropBoxToken token, string uploadSessionID, string appendedData, int offset)
+        private async Task<bool> UploadSessionAppend (string accessToken, string uploadSessionId, byte[] data, long offset)
         {
             return false; 
         }
@@ -69,7 +117,7 @@ namespace DropBox_Upload
         /// <param name="offset">The data offset</param>
         /// <param name="uploadFilePath">The location in the dropbox account the file is to be uploaded to</param>
         /// <returns>Returns true if the upload session was succfully finished, otherwise, returns false</returns>
-        public bool UploadSessionFinish (DropBoxToken token, string uploadSessionID, string appendedData, int offset, string uploadFilePath)
+        private async Task<bool> UploadSessionFinish (string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
         {
             return false;
         }
