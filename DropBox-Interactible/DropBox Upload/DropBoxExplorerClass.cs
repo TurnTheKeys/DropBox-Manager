@@ -76,8 +76,8 @@ namespace DropBox_Upload
                         else
                         {
                             Console.WriteLine("Failed to finish upload session.");
+                            return false;
                         }
-                        break;
                     }
                     else
                     {
@@ -104,8 +104,15 @@ namespace DropBox_Upload
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/start");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            // Properly format the Dropbox-API-Arg header
             request.Headers.Add("Dropbox-API-Arg", "{\"close\":false}");
-            request.Headers.Add("Content-Type", "application/octet-stream");
+
+            // Create an empty HttpContent with the correct Content-Type header
+            HttpContent content = new ByteArrayContent(Array.Empty<byte>());
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+            request.Content = content;
 
             try
             {
@@ -117,10 +124,10 @@ namespace DropBox_Upload
                     Console.WriteLine($"Status Code in UploadSessionStart: {response.StatusCode}");
                     Console.WriteLine($"Reason Phrase in UploadSessionStart: {response.ReasonPhrase}");
 
-                    if (!response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode || response.ReasonPhrase == "Bad Request")
                     {
                         string errorResponse = await response.Content.ReadAsStringAsync();
-                        // Console.WriteLine($"Error Response: {errorResponse}");
+                        Console.WriteLine($"Error Response: {errorResponse}");
                         return (false, "Error");
                     }
 
@@ -129,7 +136,7 @@ namespace DropBox_Upload
 
                     // Extract session ID from the response
                     var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
-                    string sessionId = jsonResponse.GetProperty("session_id").GetString() ?? String.Empty;
+                    string sessionId = jsonResponse.GetProperty("session_id").GetString() ?? string.Empty;
 
                     return (true, sessionId);
                 }
@@ -145,6 +152,7 @@ namespace DropBox_Upload
                 return (false, "Error");
             }
         }
+
 
         /// <summary>
         /// Uploads additional data to the upload session
@@ -182,7 +190,7 @@ namespace DropBox_Upload
                     Console.WriteLine($"Status Code in UploadSessionAppend: {response.StatusCode}");
                     Console.WriteLine($"Reason Phrase in UploadSessionAppend: {response.ReasonPhrase}");
 
-                    if (!response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode || response.ReasonPhrase == "Bad Request")
                     {
                         string errorResponse = await response.Content.ReadAsStringAsync();
                         // Console.WriteLine($"Error Response: {errorResponse}");
@@ -210,15 +218,15 @@ namespace DropBox_Upload
 
 
         /// <summary>
-        /// Finishes of the upload session
+        /// Finishes off the upload session
         /// </summary>
         /// <param name="accessToken">The access token used to access DropBox account</param>
         /// <param name="uploadSessionId">The upload session the data will be uploaded through</param>
         /// <param name="data">Data to be uploaded</param>
         /// <param name="offset">Data offset from last uploaded</param>
         /// <param name="saveWhere">Where to save the file to in the DropBox account</param>
-        /// <returns>If the upload session was succfully finished, returns true, otherwise, returns false</returns>
-        private async Task<bool> UploadSessionFinish (string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
+        /// <returns>If the upload session was successfully finished, returns true, otherwise, returns false</returns>
+        private async Task<bool> UploadSessionFinish(string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/finish");
 
@@ -236,10 +244,14 @@ namespace DropBox_Upload
                     mode = "add",
                     autorename = true,
                     mute = false
-                },
-                close = true
+                }
             }));
-            request.Headers.Add("Content-Type", "application/octet-stream");
+
+            // Add content to the request
+            HttpContent content = new ByteArrayContent(data);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+            request.Content = content;
 
             try
             {
@@ -251,10 +263,10 @@ namespace DropBox_Upload
                     Console.WriteLine($"Status Code in UploadSessionFinish: {response.StatusCode}");
                     Console.WriteLine($"Reason Phrase in UploadSessionFinish: {response.ReasonPhrase}");
 
-                    if (!response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode || response.ReasonPhrase == "Bad Request")
                     {
                         string errorResponse = await response.Content.ReadAsStringAsync();
-                         Console.WriteLine($"Error Response: {errorResponse}");
+                        Console.WriteLine($"Error Response: {errorResponse}");
                         return false;
                     }
 
@@ -275,6 +287,7 @@ namespace DropBox_Upload
                 return false;
             }
         }
+
 
         /// <summary>
         /// Starts download process

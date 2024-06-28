@@ -40,6 +40,9 @@ class DropBoxApplication
             case "4":
                 PrintTokenInformation();
                 break;
+            case "5":
+                UploadFileFilePath();
+                break;
             case "6":
                 DownloadFileFilePath();
                 break;
@@ -67,6 +70,26 @@ class DropBoxApplication
         string fileName = Console.ReadLine() ?? "";
         dropBoxExplorerClass.DownloadFileDropBox(dropboxToken, fileReference, downloadToFilePath, fileName);
     }
+
+    /// <summary>
+    /// Uploads file from given file to DropBox
+    /// </summary>
+    public void UploadFileFilePath()
+    {
+        if (dropboxToken == null || dropBoxExplorerClass == null)
+        {
+            Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
+            return;
+        }
+        Console.WriteLine("Please enter the filepath or id of the file to be uploaded:");
+        string uploadFrom = Console.ReadLine() ?? "";
+        string fileName = Path.GetFileName(uploadFrom);
+        Console.WriteLine("Please enter the filepath for where the file will be saved to in DropBox:");
+        string uploadToFilePath = Console.ReadLine() ?? "";
+        string uploadToFilePathWhole = uploadToFilePath + $"/{fileName}";
+        dropBoxExplorerClass.UploadToDropBox(dropboxToken, uploadFrom, uploadToFilePathWhole);
+    }
+
     /// <summary>
     /// Generates new access token if the dropboxToken refresh token has been loaded already
     /// </summary>
