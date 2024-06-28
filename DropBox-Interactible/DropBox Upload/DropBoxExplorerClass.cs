@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 
 namespace DropBox_Upload
 {
@@ -18,7 +19,19 @@ namespace DropBox_Upload
         private const int uploadChunkSize = 150 * 1024 * 1024; // upload chunk size limit set by Dropbox is 150 MiB
         private static readonly HttpClient client = new HttpClient();
 
-        public async Task<bool> UploadToDropBox(DropBoxToken accessToken, string filePath, string saveWhere)
+
+        public bool UploadToDropBox(DropBoxToken accessToken, string filePath, string saveWhere)
+        {
+            if (UploadSessionProcess(accessToken, filePath, saveWhere).GetAwaiter().GetResult() == true)
+            {
+                Console.WriteLine("The file was successfully uploaded!");
+                return true;
+            }
+            Console.WriteLine("The file was unsuccessfully uploaded!");
+            return false;
+        }
+
+        private async Task<bool> UploadSessionProcess(DropBoxToken accessToken, string filePath, string saveWhere)
         {
             // Remember that filepaths are formatted like so '/backups/'
             // filePath needs to also include the file it's being saved as, like '/backups/example.sql'
@@ -207,7 +220,60 @@ namespace DropBox_Upload
         /// <returns>If the upload session was succfully finished, returns true, otherwise, returns false</returns>
         private async Task<bool> UploadSessionFinish (string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
         {
-            return false;
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/finish");
+
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            request.Headers.Add("Dropbox-API-Arg", JsonSerializer.Serialize(new
+            {
+                cursor = new
+                {
+                    session_id = uploadSessionId,
+                    offset = offset
+                },
+                commit = new
+                {
+                    path = saveWhere,
+                    mode = "add",
+                    autorename = true,
+                    mute = false
+                },
+                close = true
+            }));
+            request.Headers.Add("Content-Type", "application/octet-stream");
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    // Log status code and reason phrase
+                    Console.WriteLine($"Status Code in UploadSessionFinish: {response.StatusCode}");
+                    Console.WriteLine($"Reason Phrase in UploadSessionFinish: {response.ReasonPhrase}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                         Console.WriteLine($"Error Response: {errorResponse}");
+                        return false;
+                    }
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response Body in UploadSessionFinish: {responseBody}");
+
+                    return true;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error in UploadSessionFinish: {e.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in UploadSessionFinish: {ex.Message}");
+                return false;
+            }
         }
 
         /// <summary>
@@ -224,7 +290,7 @@ namespace DropBox_Upload
                 Console.WriteLine("The file was successfully downloaded!");
                 return true;
             }
-            Console.WriteLine("The file was successfully downloaded!");
+            Console.WriteLine("The file was unsuccessfully downloaded!");
             return false;
         }
 
