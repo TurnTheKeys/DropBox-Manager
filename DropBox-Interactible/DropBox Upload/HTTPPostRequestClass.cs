@@ -51,12 +51,12 @@ namespace DropBox_Upload
 
             catch (HttpRequestException e)
             {
-                //Console.WriteLine($"Request error: {e.Message}");
+                Console.WriteLine($"Request error in AsyncDropBoxConnection: {e.Message}");
                 return (false, "Error");
             }
             catch (Exception ex)
             {
-                //Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine($"Exception in AsyncDropBoxConnection: {ex.Message}");
                 return (false, "Error");
             }
 

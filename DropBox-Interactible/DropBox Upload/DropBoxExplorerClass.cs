@@ -32,9 +32,9 @@ namespace DropBox_Upload
                 return false;
             }
 
-            string uploadSessionId = await UploadSessionStart(accessToken.RetrieveAccessToken().accessToken);
+            var uploadSessionId = await UploadSessionStart(accessToken.RetrieveAccessToken().accessToken);
 
-            if (uploadSessionId == null)
+            if (uploadSessionId.uploadID == null)
             {
                 Console.WriteLine($"Failed to commence upload session for file: {filePath}");
                 return false;
@@ -54,7 +54,7 @@ namespace DropBox_Upload
 
                     if (remainingBytes <= uploadChunkSize)
                     {
-                        var result = await UploadSessionFinish(accessToken.RetrieveAccessToken().accessToken, uploadSessionId, buffer, offset, saveWhere);
+                        var result = await UploadSessionFinish(accessToken.RetrieveAccessToken().accessToken, uploadSessionId.uploadID, buffer, offset, saveWhere);
                         if (result)
                         {
                             Console.WriteLine("File uploaded successfully.");
@@ -68,7 +68,7 @@ namespace DropBox_Upload
                     }
                     else
                     {
-                        bool success = await UploadSessionAppend(accessToken.RetrieveAccessToken().accessToken, uploadSessionId, buffer, offset);
+                        bool success = await UploadSessionAppend(accessToken.RetrieveAccessToken().accessToken, uploadSessionId.uploadID, buffer, offset);
                         if (!success)
                         {
                             Console.WriteLine("Failed to append data to upload session.");
@@ -87,36 +87,124 @@ namespace DropBox_Upload
         /// </summary>
         /// <param name="token">The token for the dropbox account</param>
         /// <returns>Returns the id of the dropbox upload session, otherwise, returns false</returns>
-        private async Task<string> UploadSessionStart (string accessToken)
+        private async Task<(bool success, string uploadID)> UploadSessionStart(string accessToken)
         {
-            string UploadSessionID = "";
-            
-            return UploadSessionID;
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/start");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            request.Headers.Add("Dropbox-API-Arg", "{\"close\":false}");
+            request.Headers.Add("Content-Type", "application/octet-stream");
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    // Log status code and reason phrase
+                    Console.WriteLine($"Status Code in UploadSessionStart: {response.StatusCode}");
+                    Console.WriteLine($"Reason Phrase in UploadSessionStart: {response.ReasonPhrase}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                        // Console.WriteLine($"Error Response: {errorResponse}");
+                        return (false, "Error");
+                    }
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response Body in UploadSessionStart: {responseBody}");
+
+                    // Extract session ID from the response
+                    var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
+                    string sessionId = jsonResponse.GetProperty("session_id").GetString() ?? String.Empty;
+
+                    return (true, sessionId);
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error in UploadSessionStart: {e.Message}");
+                return (false, "Error");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in UploadSessionStart: {ex.Message}");
+                return (false, "Error");
+            }
         }
 
         /// <summary>
         /// Uploads additional data to the upload session
         /// </summary>
-        /// <param name="token">The token for accesss to the DropBox Account</param>
-        /// <param name="uploadSessionID">The upload session the data is to be uploaded to.</param>
-        /// <param name="appendedData">The data to be uploaded</param>
-        /// <param name="offset">The data offset</param>
-        /// <returns>Returns true if the data was succesfully appended to the upload session, otherwise, returns false</returns>
-        private async Task<bool> UploadSessionAppend (string accessToken, string uploadSessionId, byte[] data, long offset)
+        /// <param name="accessToken">The access token used to access DropBox account</param>
+        /// <param name="uploadSessionId">The upload session the data will be uploaded through</param>
+        /// <param name="data">Data to be uploaded</param>
+        /// <param name="offset">Data offset from last uploaded</param>
+        /// <returns>If the append was successful, returns true, else, returns false</returns>
+        private async Task<bool> UploadSessionAppend(string accessToken, string uploadSessionId, byte[] data, long offset)
         {
-            return false; 
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/append_v2");
+
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            request.Headers.Add("Dropbox-API-Arg", JsonSerializer.Serialize(new
+            {
+                cursor = new
+                {
+                    session_id = uploadSessionId,
+                    offset = offset
+                },
+                close = false
+            }));
+            request.Headers.Add("Content-Type", "application/octet-stream");
+
+            request.Content = new ByteArrayContent(data);
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    // Log status code and reason phrase
+                    Console.WriteLine($"Status Code in UploadSessionAppend: {response.StatusCode}");
+                    Console.WriteLine($"Reason Phrase in UploadSessionAppend: {response.ReasonPhrase}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                        // Console.WriteLine($"Error Response: {errorResponse}");
+                        return false;
+                    }
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response Body in UploadSessionAppend: {responseBody}");
+
+                    return true;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error in UploadSessionAppend: {e.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in UploadSessionAppend: {ex.Message}");
+                return false;
+            }
         }
+
 
 
         /// <summary>
         /// Finishes of the upload session
         /// </summary>
-        /// <param name="token">The token for accesss to the DropBox Account</param>
-        /// <param name="uploadSessionID">The upload session the data is to be uploaded to.</param>
-        /// <param name="appendedData">The data to be uploaded</param>
-        /// <param name="offset">The data offset</param>
-        /// <param name="uploadFilePath">The location in the dropbox account the file is to be uploaded to</param>
-        /// <returns>Returns true if the upload session was succfully finished, otherwise, returns false</returns>
+        /// <param name="accessToken">The access token used to access DropBox account</param>
+        /// <param name="uploadSessionId">The upload session the data will be uploaded through</param>
+        /// <param name="data">Data to be uploaded</param>
+        /// <param name="offset">Data offset from last uploaded</param>
+        /// <param name="saveWhere">Where to save the file to in the DropBox account</param>
+        /// <returns>If the upload session was succfully finished, returns true, otherwise, returns false</returns>
         private async Task<bool> UploadSessionFinish (string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
         {
             return false;
