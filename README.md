@@ -1,8 +1,9 @@
-# DropBox Manager (in-progress)
-
+# DropBox Manager (hiatus)
 ## Goal
 - The goal is to make a program that can be used with a GitHub account.
 - This includes generations of tokens in addition to exploring, downloading and uploading files
+### Project status:
+- Project progress will likely not be worked on until 6th May 2024 as I will be working on another project
 
 <details>
   <summary><h2>Intended Functions</h2></summary>
@@ -23,10 +24,10 @@
     - Generating Access Token
     - Download of files (through filepath)
   - Currently Working on
-    - Upload of files
     - Feature Manual
   - Working on Next:
     - Printing to console: Directory files and folders, Dropbox file ID
+    - Upload of files
 
 </details>
 <details>
