@@ -164,7 +164,7 @@ namespace DropBox_Upload
                     {"client_secret", RefreshToken.app_secret}
                 };
             string dropBoxURL = "https://api.dropbox.com/oauth2/token";
-            var attemptConnection = HTTPPostRequest.PostRequest(dropBoxURL, parameters);
+            var attemptConnection = HTTPPostRequest.PostRequestParameters(dropBoxURL, parameters);
             if (attemptConnection.success)
             {
                 var tokensInformation = JObject.Parse(attemptConnection.responseBody);
@@ -194,7 +194,7 @@ namespace DropBox_Upload
                 };
 
             string dropBoxURL = "https://api.dropbox.com/oauth2/token";
-            var attemptConnection = HTTPPostRequest.PostRequest(dropBoxURL, parameters);
+            var attemptConnection = HTTPPostRequest.PostRequestParameters(dropBoxURL, parameters);
             if (attemptConnection.success)
             {
                 var tokensInformation = JObject.Parse(attemptConnection.responseBody);
