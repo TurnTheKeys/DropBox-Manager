@@ -81,7 +81,7 @@ namespace DropBox_Upload
                     }
                     else
                     {
-                        bool success = await UploadSessionAppend(accessToken.RetrieveAccessToken().accessToken, uploadSessionId.uploadID, buffer, offset);
+                        bool success = UploadSessionAppend(accessToken.RetrieveAccessToken().accessToken, uploadSessionId.uploadID, buffer, offset);
                         if (!success)
                         {
                             Console.WriteLine("Failed to append data to upload session.");
@@ -153,67 +153,26 @@ namespace DropBox_Upload
             }
         }
 
-
-        /// <summary>
-        /// Uploads additional data to the upload session
-        /// </summary>
-        /// <param name="accessToken">The access token used to access DropBox account</param>
-        /// <param name="uploadSessionId">The upload session the data will be uploaded through</param>
-        /// <param name="data">Data to be uploaded</param>
-        /// <param name="offset">Data offset from last uploaded</param>
-        /// <returns>If the append was successful, returns true, else, returns false</returns>
-        private async Task<bool> UploadSessionAppend(string accessToken, string uploadSessionId, byte[] data, long offset)
+        private bool UploadSessionAppend(string accessToken, string uploadSessionId, byte[] data, long offset)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/append_v2");
-
-            request.Headers.Add("Authorization", $"Bearer {accessToken}");
-            request.Headers.Add("Dropbox-API-Arg", JsonSerializer.Serialize(new
+            Dictionary<string, string> headers = new Dictionary<string, string>()
             {
-                cursor = new
-                {
-                    session_id = uploadSessionId,
-                    offset = offset
-                },
-                close = false
-            }));
-
-            HttpContent content = new ByteArrayContent(data);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-            request.Content = content;
-
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    // Log status code and reason phrase
-                    Console.WriteLine($"Status Code in UploadSessionAppend: {response.StatusCode}");
-                    Console.WriteLine($"Reason Phrase in UploadSessionAppend: {response.ReasonPhrase}");
-
-                    if (!response.IsSuccessStatusCode || response.ReasonPhrase == "Bad Request")
+                { "Authorization", $"Bearer {accessToken}" },
+                { "Dropbox-API-Arg", JsonSerializer.Serialize(new
                     {
-                        string errorResponse = await response.Content.ReadAsStringAsync();
-                        // Console.WriteLine($"Error Response: {errorResponse}");
-                        return false;
-                    }
-
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Response Body in UploadSessionAppend: {responseBody}");
-
-                    return true;
+                        cursor = new
+                        {
+                            session_id = uploadSessionId,
+                            offset = offset
+                        },
+                        close = false
+                    })
                 }
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine($"Request error in UploadSessionAppend: {e.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception in UploadSessionAppend: {ex.Message}");
-                return false;
-            }
+            };
+
+            string url = "https://content.dropboxapi.com/2/files/upload_session/append_v2";
+            var sessionResult = HTTPPostRequest.PostRequestHeaders(url, headers, data);
+            return sessionResult.success;
         }
 
         /// <summary>
@@ -227,7 +186,7 @@ namespace DropBox_Upload
         /// <returns>If the upload session was successfully finished, returns true, otherwise, returns false</returns>
         private bool UploadSessionFinish(string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
         {
-            var headers = new Dictionary<string, string>
+            Dictionary<string, string> headers = new Dictionary<string, string>
             {
                 { "Authorization", $"Bearer {accessToken}" },
                 { "Dropbox-API-Arg", JsonSerializer.Serialize(new
