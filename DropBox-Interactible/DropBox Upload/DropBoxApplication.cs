@@ -81,7 +81,7 @@ class DropBoxApplication
             Console.WriteLine("You've yet to setup the token! Please select option 1 to read a token first or selecting option 2 to generate a new one before trying again.");
             return;
         }
-        Console.WriteLine("Please enter the filepath or id of the file to be uploaded:");
+        Console.WriteLine("Please enter the filepath of the file to be uploaded:");
         string uploadFrom = Console.ReadLine() ?? "";
         string fileName = Path.GetFileName(uploadFrom);
         Console.WriteLine("Please enter the filepath for where the file will be saved to in DropBox:");

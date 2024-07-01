@@ -102,7 +102,6 @@ namespace DropBox_Upload
                 {
                     HttpResponseMessage response = await client.SendAsync(requestGenerated.request);
 
-                    // Log status code and reason phrase
                     Console.WriteLine($"Status Code: {response.StatusCode}");
                     Console.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
 
@@ -115,12 +114,7 @@ namespace DropBox_Upload
 
                     string responseBody = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Response Body : {responseBody}");
-
-                    // Extract session ID from the response
-                    var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
-                    string sessionId = jsonResponse.GetProperty("session_id").GetString() ?? string.Empty;
-
-                    return (true, sessionId);
+                    return (true, responseBody);
                 }
             }
             catch (HttpRequestException e)
@@ -130,7 +124,7 @@ namespace DropBox_Upload
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in UploadSessionStart: {ex.Message}");
+                Console.WriteLine($"Exception in AsyncDropBoxConnectionHeaders: {ex.Message}");
                 return (false, "Error");
             }
         }
@@ -141,7 +135,7 @@ namespace DropBox_Upload
         /// <param name="URL">URL for request to be sent through</param>
         /// <param name="headers"></param>
         /// <returns>returns true and filled request if successful, otherwise returns false and an empty request</returns>
-        private (bool success, HttpRequestMessage? request) RequestGenerate (string URL, Dictionary<string, string> headers, byte[] data)
+        private (bool success, HttpRequestMessage? request) RequestGenerate(string URL, Dictionary<string, string> headers, byte[] data)
         {
             try
             {
@@ -150,14 +144,16 @@ namespace DropBox_Upload
                 {
                     request.Headers.Add(header.Key, header.Value);
                 }
-                request.Content = new ByteArrayContent(data);
+                HttpContent content = new ByteArrayContent(data);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                request.Content = content;
                 return (true, request);
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Issue with generating request to {URL} with headers {string.Join(", ", headers.Select(h => $"{h.Key}: {h.Value}"))}: {e}");
                 return (false, null);
-            } 
+            }
         }
     }
 }
