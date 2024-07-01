@@ -176,9 +176,10 @@ namespace DropBox_Upload
                 },
                 close = false
             }));
-            request.Headers.Add("Content-Type", "application/octet-stream");
 
-            request.Content = new ByteArrayContent(data);
+            HttpContent content = new ByteArrayContent(data);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+            request.Content = content;
 
             try
             {
@@ -215,8 +216,6 @@ namespace DropBox_Upload
             }
         }
 
-
-
         /// <summary>
         /// Finishes off the upload session
         /// </summary>
@@ -247,11 +246,9 @@ namespace DropBox_Upload
                 }
             }));
 
-            request.Headers.Add("Content-Type", "application/octet-stream");
             // Add content to the request
             HttpContent content = new ByteArrayContent(data);
             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-
             request.Content = content;
 
             try
@@ -288,6 +285,7 @@ namespace DropBox_Upload
                 return false;
             }
         }
+
         /*
         private async Task<bool> UploadSessionFinish(string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
         {

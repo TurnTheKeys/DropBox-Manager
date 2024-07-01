@@ -76,9 +76,9 @@ namespace DropBox_Upload
         /// <param name="websiteURL">URL for the request to be sent through</param>
         /// <param name="headers"></param>
         /// <returns></returns>
-        public (bool success, string responseBody) PostRequestHeaders(string websiteURL, Dictionary<string, string> headers, HttpContent content)
+        public (bool success, string responseBody) PostRequestHeaders(string websiteURL, Dictionary<string, string> headers, byte[] data)
         {
-            return AsyncDropBoxConnectionHeaders(websiteURL, headers, content).GetAwaiter().GetResult();
+            return AsyncDropBoxConnectionHeaders(websiteURL, headers, data).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace DropBox_Upload
         /// <param name="headers">Parameters to be sent through dropbox url</param>
         /// /// <param name="content">Contents to be sent through request</param>
         /// <returns>Returns tuple. The 'success' and 'responseBody'. For success, returns true if the attempt was successful, otherwise returns false. "responseBody" holds the response.</returns>
-        private async Task<(bool success, string responseBody)> AsyncDropBoxConnectionHeaders(string DropBoxURL, Dictionary<string, string> headers, HttpContent content)
+        private async Task<(bool success, string responseBody)> AsyncDropBoxConnectionHeaders(string DropBoxURL, Dictionary<string, string> headers, byte[] data)
         {
-            var requestGenerated = RequestGenerate(DropBoxURL, headers, content);
+            var requestGenerated = RequestGenerate(DropBoxURL, headers, data);
             if (!requestGenerated.success || requestGenerated.request == null)
             {
                 Console.WriteLine("The request could not be submitted.");
@@ -141,7 +141,7 @@ namespace DropBox_Upload
         /// <param name="URL">URL for request to be sent through</param>
         /// <param name="headers"></param>
         /// <returns>returns true and filled request if successful, otherwise returns false and an empty request</returns>
-        private (bool success, HttpRequestMessage? request) RequestGenerate (string URL, Dictionary<string, string> headers, HttpContent content)
+        private (bool success, HttpRequestMessage? request) RequestGenerate (string URL, Dictionary<string, string> headers, byte[] data)
         {
             try
             {
@@ -150,7 +150,7 @@ namespace DropBox_Upload
                 {
                     request.Headers.Add(header.Key, header.Value);
                 }
-                request.Content = content;
+                request.Content = new ByteArrayContent(data);
                 return (true, request);
             }
             catch (Exception e)
