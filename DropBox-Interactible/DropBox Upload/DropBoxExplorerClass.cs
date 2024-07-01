@@ -247,9 +247,10 @@ namespace DropBox_Upload
                 }
             }));
 
+            request.Headers.Add("Content-Type", "application/octet-stream");
             // Add content to the request
             HttpContent content = new ByteArrayContent(data);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+            //content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
             request.Content = content;
 
@@ -287,7 +288,33 @@ namespace DropBox_Upload
                 return false;
             }
         }
+        /*
+        private async Task<bool> UploadSessionFinish(string accessToken, string uploadSessionId, byte[] data, long offset, string saveWhere)
+        {
+            var headers = new Dictionary<string, string>
+            {
+                            { "Authorization", $"Bearer {accessToken}" },
+                            { "Dropbox-API-Arg", JsonSerializer.Serialize(new
+                                {
+                                    cursor = new
+                                    {
+                                        session_id = uploadSessionId,
+                                        offset = offset
+                                    },
+                                    commit = new
+                                    {
+                                        path = saveWhere,
+                                        mode = "add",
+                                        autorename = true,
+                                        mute = false
+                                    }
+                                })
+                            }
+                        };
 
+            var sessionResult = HTTPPostRequest.PostRequestHeaders(headers,)
+        }
+        */
 
         /// <summary>
         /// Starts download process
