@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DropBox_Upload
 {
@@ -44,8 +45,7 @@ namespace DropBox_Upload
                 Console.WriteLine($"File does not exist: {filePath}");
                 return false;
             }
-
-            var uploadSessionId = await UploadSessionStart(accessToken.RetrieveAccessToken().accessToken);
+            var uploadSessionId = UploadSessionStart(accessToken.RetrieveAccessToken().accessToken);
 
             if (uploadSessionId.uploadID == null)
             {
@@ -95,61 +95,31 @@ namespace DropBox_Upload
             return true;
         }
 
-        /// <summary>
-        /// Commences DropBox Upload session using given dropbox token
-        /// </summary>
-        /// <param name="token">The token for the dropbox account</param>
-        /// <returns>Returns the id of the dropbox upload session, otherwise, returns false</returns>
-        private async Task<(bool success, string uploadID)> UploadSessionStart(string accessToken)
+        private (bool success, string uploadID) UploadSessionStart(string accessToken)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://content.dropboxapi.com/2/files/upload_session/start");
-            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            Dictionary<string, string> headers = new Dictionary<string, string>()
+            {
+                { "Authorization", $"Bearer {accessToken}" },
+                {"Dropbox-API-Arg", "{\"close\":false}" }
+            };
+            byte[] emptyContent = new byte[0];
+            string url = "https://content.dropboxapi.com/2/files/upload_session/start";
+            var requestOutcome = HTTPPostRequest.PostRequestHeaders(url, headers, emptyContent);
 
-            // Properly format the Dropbox-API-Arg header
-            request.Headers.Add("Dropbox-API-Arg", "{\"close\":false}");
-
-            // Create an empty HttpContent with the correct Content-Type header
-            HttpContent content = new ByteArrayContent(Array.Empty<byte>());
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-
-            request.Content = content;
-
+            if (!requestOutcome.success)
+            {
+                return (false, "Error generating id");
+            }
             try
             {
-                using (var client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    // Log status code and reason phrase
-                    Console.WriteLine($"Status Code in UploadSessionStart: {response.StatusCode}");
-                    Console.WriteLine($"Reason Phrase in UploadSessionStart: {response.ReasonPhrase}");
-
-                    if (!response.IsSuccessStatusCode || response.ReasonPhrase == "Bad Request")
-                    {
-                        string errorResponse = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error Response: {errorResponse}");
-                        return (false, "Error");
-                    }
-
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Response Body in UploadSessionStart: {responseBody}");
-
-                    // Extract session ID from the response
-                    var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
-                    string sessionId = jsonResponse.GetProperty("session_id").GetString() ?? string.Empty;
-
-                    return (true, sessionId);
-                }
+                var jsonResponse = JsonSerializer.Deserialize<JsonElement>(requestOutcome.responseBody);
+                string sessionId = jsonResponse.GetProperty("session_id").GetString() ?? string.Empty;
+                return (true, sessionId);
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Request error in UploadSessionStart: {e.Message}");
-                return (false, "Error");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception in UploadSessionStart: {ex.Message}");
-                return (false, "Error");
+                Console.WriteLine($"Error generating upload session_id, error: {e}");
+                return (false,"Error parsing json for session_id");
             }
         }
 
