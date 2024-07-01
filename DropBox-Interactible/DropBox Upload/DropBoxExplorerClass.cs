@@ -250,7 +250,7 @@ namespace DropBox_Upload
             request.Headers.Add("Content-Type", "application/octet-stream");
             // Add content to the request
             HttpContent content = new ByteArrayContent(data);
-            //content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
             request.Content = content;
 
